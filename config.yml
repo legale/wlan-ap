@@ -1,9 +1,17 @@
 repo:  https://github.com/openwrt/openwrt.git
-branch: openwrt-21.02
-revision: c67509efd7d0c43eb3f622f06c8a31aa28d22f6e
+branch: openwrt-22.03
+revision: cd117f0596e01e1ced3dbdb046216cd7807bf6fb
 output_dir: ./output
 
 patch_folders:
+  - patches_new/base/
+  - patches_new/ipq40xx/
+  - patches_new/ipq807x/
+  - patches_new/rest/
+  - patches_new/wifi/
+  - patches_new/x86/
+
+_patch_folders:
   - patches/backports/
   - patches/base
   - patches/wifi

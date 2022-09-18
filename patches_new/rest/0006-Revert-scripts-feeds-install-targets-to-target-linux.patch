@@ -1,0 +1,102 @@
+From 0412cab6106801f07879d39e9c9943dc7ae4813c Mon Sep 17 00:00:00 2001
+From: John Crispin <john@phrozen.org>
+Date: Fri, 23 Sep 2022 15:43:40 +0200
+Subject: [PATCH] Revert "scripts/feeds: install targets to target/linux/feeds
+ and support overriding"
+
+This reverts commit ebc36ebb2349ef5d492dd2bd5be962bac26bb19a.
+---
+ scripts/feeds | 34 ++++++++--------------------------
+ 1 file changed, 8 insertions(+), 26 deletions(-)
+
+diff --git a/scripts/feeds b/scripts/feeds
+index 94d6d91283..18c3464313 100755
+--- a/scripts/feeds
++++ b/scripts/feeds
+@@ -434,16 +434,14 @@ sub do_install_target($) {
+ 		$path =~ s/\/Makefile$//;
+ 		my $name = $path;
+ 		$name =~ s/.*\///;
+-		my $dest = "./target/linux/feeds/$name";
+-
+-		-d "./target/linux/feeds" or mkdir "./target/linux/feeds";
++		my $dest = "./target/linux/$name";
+ 
+ 		-e $dest and do {
+ 			warn "Path $dest already exists";
+ 			return 1;
+ 		};
+ 
+-		system("ln -sf ../../../$path ./target/linux/feeds/");
++		system("ln -sf ../../$path ./target/linux/");
+ 	} else {
+ 		warn "Target is not valid\n";
+ 		return 1;
+@@ -500,34 +498,18 @@ sub is_core_src($) {
+ sub install_target {
+ 	my $feed = shift;
+ 	my $name = shift;
+-	my $force = shift;
+ 
+ 	$feed = lookup_target($feed, $name);
+-	my $feed_name = $feed->[1];
+-
+-	-e "target/linux/feeds/$name" and return 0;
+ 
+-	# enable force flag if feed src line was declared with --force
+-	if (exists($feed->[3]{force})) {
+-		$force = 1;
+-	}
++	$installed_targets{$name} and return 0;
+ 
+-	$feed = $feed_cache{$feed_name}->[2];
++	$feed = $feed_cache{$feed->[1]}->[2];
+ 	$feed or return 0;
+ 
+ 	my $target = $feed->{$name};
+ 	$target or return 0;
+ 
+-	if (-e "target/linux/$name") {
+-		if ($force) {
+-			warn "Overriding target '$name' with version from '$feed_name'\n";
+-		} else {
+-			warn "WARNING: Not overriding core target '$name'; use -f to force\n";
+-			return 0;
+-		}
+-	} else {
+-		warn "Installing target '$name'\n";
+-	}
++	warn "Installing target '$name'\n";
+ 	return do_install_target($target);
+ }
+ 
+@@ -638,7 +620,7 @@ sub install_target_or_package {
+ 	my $force = shift;
+ 
+ 	lookup_target($feed, $name) and do {
+-		return install_target($feed, $name, $force);
++		return install_target($feed, $name);
+ 	};
+ 
+ 	lookup_src($feed, $name) and do {
+@@ -785,7 +767,7 @@ sub uninstall {
+ 		}
+ 		get_installed();
+ 		while ($name = shift @ARGV) {
+-			my $target = "target/linux/feeds/$name";
++			my $target = "target/linux/$name";
+ 			-l "$target" and do {
+ 				uninstall_target($target);
+ 				$uninstall = 1;
+@@ -998,7 +980,7 @@ my %commands = (
+ 	'feed_config' => \&feed_config,
+ 	'setup' => \&setup,
+ 	'clean' => sub {
+-		system("rm -rf ./feeds ./package/feeds ./target/linux/feeds");
++		system("rm -rf ./feeds ./package/feeds");
+ 	}
+ );
+ 
+-- 
+2.25.1
+

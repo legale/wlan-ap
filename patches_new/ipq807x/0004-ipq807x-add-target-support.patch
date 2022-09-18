@@ -1,7 +1,7 @@
-From bc2ab805fd859c143513bd4c7fabfd93c984a15a Mon Sep 17 00:00:00 2001
+From 19f1d6bcd27aa8c13825d918780a5b986ce10a33 Mon Sep 17 00:00:00 2001
 From: John Crispin <john@phrozen.org>
 Date: Fri, 16 Sep 2022 14:04:03 +0200
-Subject: [PATCH] ipq807x: add target support
+Subject: [PATCH 4/7] ipq807x: add target support
 
 Signed-off-by: John Crispin <john@phrozen.org>
 ---
@@ -9,13 +9,12 @@ Signed-off-by: John Crispin <john@phrozen.org>
  include/image.mk                          |  6 +++-
  include/kernel-4.4                        |  2 ++
  package/boot/uboot-envtools/files/ipq807x | 37 +++++++++++++++++++++++
- package/kernel/linux/modules/netfilter.mk |  3 +-
- 5 files changed, 54 insertions(+), 3 deletions(-)
+ 4 files changed, 53 insertions(+), 1 deletion(-)
  create mode 100644 include/kernel-4.4
  create mode 100644 package/boot/uboot-envtools/files/ipq807x
 
 diff --git a/config/Config-kernel.in b/config/Config-kernel.in
-index 5e12ddd78d..40e9a1bda3 100644
+index 31d4e276fd..9319259e14 100644
 --- a/config/Config-kernel.in
 +++ b/config/Config-kernel.in
 @@ -2,6 +2,15 @@
@@ -109,27 +108,6 @@ index 0000000000..6c429f1852
 +config_foreach ubootenv_add_app_config ubootenv
 +
 +exit 0
-diff --git a/package/kernel/linux/modules/netfilter.mk b/package/kernel/linux/modules/netfilter.mk
-index 10157cac2f..4964c94954 100644
---- a/package/kernel/linux/modules/netfilter.mk
-+++ b/package/kernel/linux/modules/netfilter.mk
-@@ -350,7 +350,6 @@ IPSET_MODULES:= \
- 	ipset/ip_set_bitmap_ipmac \
- 	ipset/ip_set_bitmap_port \
- 	ipset/ip_set_hash_ip \
--	ipset/ip_set_hash_ipmac \
- 	ipset/ip_set_hash_ipmark \
- 	ipset/ip_set_hash_ipport \
- 	ipset/ip_set_hash_ipportip \
-@@ -389,7 +388,7 @@ define KernelPackage/ipt-ipset
- 	CONFIG_IP_SET_HASH_NETPORTNET \
- 	CONFIG_IP_SET_LIST_SET \
- 	CONFIG_NET_EMATCH_IPSET=n
--  FILES:=$(foreach mod,$(IPSET_MODULES),$(LINUX_DIR)/net/netfilter/$(mod).ko)
-+  FILES:=$(foreach mod,$(IPSET_MODULES),$(LINUX_DIR)/net/netfilter/$(mod).ko) $(LINUX_DIR)/net/netfilter/ip_set_hash_ipmac.ko@ge4.8
-   AUTOLOAD:=$(call AutoLoad,49,$(notdir $(IPSET_MODULES)))
- endef
- $(eval $(call KernelPackage,ipt-ipset))
 -- 
 2.25.1
 
