@@ -1,0 +1,38 @@
+From 11958636e14e049367ff8ca2551bd43872143e0d Mon Sep 17 00:00:00 2001
+From: Isaev Ruslan <legale.legale@gmail.com>
+Date: Wed, 5 Oct 2022 10:50:05 -0400
+Subject: [PATCH] base-files: update banner
+
+Signed-off-by: Isaev Ruslan <legale.legale@gmail.com>
+---
+ package/base-files/files/etc/banner | 19 +++++++++++--------
+ 1 file changed, 11 insertions(+), 8 deletions(-)
+
+diff --git a/package/base-files/files/etc/banner b/package/base-files/files/etc/banner
+index 65c175e1ef..b414e099c2 100644
+--- a/package/base-files/files/etc/banner
++++ b/package/base-files/files/etc/banner
+@@ -1,9 +1,12 @@
+-  _______                     ________ __ ______ __
+- |       |.-----.-----.-----.|  |  |  |__|   ___|__|
+- |   -   ||  _  |  -__|     ||  |  |  |  |   ___|  |
+- |_______||   __|_____|__|__||________|__|__|   |__|
+-          |__| W I R E L E S S   F R E E D O M
+- ---------------------------------------------------
+- ApNos-%a-%x
++888b    888 8888888888 88888888888     d8888 888b     d888  .d8888b.  
++8888b   888 888            888        d88888 8888b   d8888 d88P  Y88b 
++88888b  888 888            888       d88P888 88888b.d88888 Y88b.      
++888Y88b 888 8888888        888      d88P 888 888Y88888P888  "Y888b.   
++888 Y88b888 888            888     d88P  888 888 Y888P 888     "Y88b. 
++888  Y88888 888            888    d88P   888 888  Y8P  888       "888 
++888   Y8888 888            888   d8888888888 888   "   888 Y88b  d88P 
++888    Y888 8888888888     888  d88P     888 888       888  "Y8888P"  
++---------------------------------------------------------------------
+  %D %V, %C
+- ---------------------------------------------------
++---------------------------------------------------------------------
++
+-- 
+2.35.1
+
