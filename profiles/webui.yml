@@ -3,7 +3,7 @@ description: Add the webui dependencies
 feeds:
   - name: luci
     uri: https://github.com/openwrt/luci.git
-    revision: 69231a7d62a3b809fc5972071e691fb02730a10e
+    revision: 3923199f8e0e746929a8804c43f9064283b9f785
 packages:
   - cgi-io
   - liblucihttp
