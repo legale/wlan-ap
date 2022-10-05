@@ -1,7 +1,7 @@
 repo:  https://github.com/openwrt/openwrt.git
 branch: openwrt-21.02
 output_dir: ./output
-
+revision: c67509efd7d0c43eb3f622f06c8a31aa28d22f6e
 patch_folders:
   - patches/backports/
   - patches/base
