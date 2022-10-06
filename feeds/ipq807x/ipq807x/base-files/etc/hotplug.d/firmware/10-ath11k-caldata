@@ -116,7 +116,7 @@ case "$FIRMWARE" in
 	plasmacloud,pax1800-v1|\
 	plasmacloud,pax1800-v2|\
 	yuncore,ax840)
-                caldata_extract "0:ART" 0x1000 0x20000  
+                caldata_extract "0:ART" 0x1000 0x10000  
 		;;
 	esac
 	;;
