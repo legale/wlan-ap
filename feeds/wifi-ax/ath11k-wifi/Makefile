@@ -235,7 +235,7 @@ endef
 define Package/ath11k-wifi-yuncore-ax840/install
 	$(INSTALL_DIR) $(1)/lib/firmware/ath11k/IPQ6018/hw1.0/
 	$(INSTALL_DATA) ./board-2.bin.IPQ6018 $(1)/lib/firmware/ath11k/IPQ6018/hw1.0/board-2.bin
-	$(INSTALL_DATA) ./qdss_trace_config.bin $(1)/lib/firmware/ath11k/IPQ6018/hw1.0/qdss_trace_config.bin
+	$(INSTALL_DATA) ./qdss_trace_config.bin.IPQ6018 $(1)/lib/firmware/ath11k/IPQ6018/hw1.0/qdss_trace_config.bin
 endef
 
 $(eval $(call generate-ath11k-wifi-package,cig-wf188,Cigtech WF188))
