@@ -55,6 +55,7 @@ qcom_setup_interfaces()
 	wallys,dr6018|\
 	cig,wf188n|\
 	cig,wf196|\
+    yuncore,ax880|\
 	muxi,ap3220l)
 		ucidef_set_interface_lan "eth1"
 		ucidef_set_interface_wan "eth0"

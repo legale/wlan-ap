@@ -1,0 +1,18 @@
+---
+profile: yuncore_ax880
+target: ipq807x
+subtarget: generic
+description: Build image for the YunCore AX880
+image:  bin/targets/ipq807x/generic/openwrt-ipq807x-yuncore_ax880-squashfs-sysupgrade.tar
+feeds:
+  - name: ipq807x
+    path: ../../feeds/ipq807x
+  - name: wda
+    path: /sdk1/wda/openwrt
+packages:
+  - ipq807x
+include:
+  - wifi-ax
+  - ucentral-ap
+diffconfig: |
+  CONFIG_KERNEL_IPQ_MEM_PROFILE=0

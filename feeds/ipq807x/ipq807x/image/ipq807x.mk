@@ -106,3 +106,17 @@ define Device/tplink_ex447
   IMAGE/nand-factory.ubi := append-ubi
 endef
 TARGET_DEVICES += tplink_ex447
+
+define Device/yuncore_ax880
+  DEVICE_TITLE := Yuncore AX880
+  DEVICE_DTS := qcom-ipq807x-ax880
+  DEVICE_DTS_CONFIG=config@hk09
+  SUPPORTED_DEVICES := yuncore,ax880
+  DEVICE_PACKAGES := ath11k-wifi-yuncore-ax880
+  IMAGES := sysupgrade.tar nand-factory.bin nand-factory.ubi
+  IMAGE/sysupgrade.tar := sysupgrade-tar | append-metadata
+  IMAGE/nand-factory.bin := append-ubi | qsdk-ipq-factory-nand
+  IMAGE/nand-factory.ubi := append-ubi
+endef
+TARGET_DEVICES += yuncore_ax880
+

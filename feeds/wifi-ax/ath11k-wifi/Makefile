@@ -52,6 +52,7 @@ ALLWIFIBOARDS:= \
 	tplink-ex227 \
 	tplink-ex447 \
 	yuncore-ax840 \
+	yuncore-ax880 \
 	yuncore-fap650 \
 	yuncore-fap655 \
 	meshpp-s618
@@ -287,6 +288,7 @@ $(eval $(call generate-ath11k-wifi-package,indio-um-510axm-v1,Indio UM-510AXM V1
 $(eval $(call generate-ath11k-wifi-package,tplink-ex227,TP-Link EX227))
 $(eval $(call generate-ath11k-wifi-package,tplink-ex447,TP-Link EX447))
 $(eval $(call generate-ath11k-wifi-package,yuncore-ax840,YunCore AX840))
+$(eval $(call generate-ath11k-wifi-package,yuncore-ax880,YunCore AX880))
 $(eval $(call generate-ath11k-wifi-package,meshpp-s618,Mesh++ S618))
 $(eval $(call generate-ath11k-wifi-package,muxi-ap3220l,MUXI AP3220L))
 $(eval $(call generate-ath11k-wifi-package,yuncore-fap650,YunCore FAP650))

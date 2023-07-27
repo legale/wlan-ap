@@ -143,6 +143,7 @@ platform_check_image() {
 	tplink,ex227|\
 	tplink,ex447|\
 	yuncore,ax840|\
+	yuncore,ax880|\
 	yuncore,fap650|\
 	yuncore,fap655|\
 	motorola,q14|\
@@ -258,6 +259,7 @@ platform_do_upgrade() {
 		platform_do_upgrade_dualboot_datachk "$1"
 		;;
 	yuncore,ax840|\
+	yuncore,ax880|\
 	yuncore,fap655)
 		[ -f /proc/boot_info/rootfs/upgradepartition ] && {
 			CI_UBIPART="$(cat /proc/boot_info/rootfs/upgradepartition)"
