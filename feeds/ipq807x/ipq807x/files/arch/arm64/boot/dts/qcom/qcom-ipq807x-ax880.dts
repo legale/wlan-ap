@@ -211,21 +211,21 @@
 
 	/* POWER_LED */
 	led_pins: led_pins {
-		led_sys {
+		led_sys: system  {
 			pins = "gpio0";
 			function = "gpio";
 			drive-strength = <8>;
 			bias-pull-down;
 		};
 
-		led_2g {
+		wlan2g {
 			pins = "gpio2";
 			function = "gpio";
 			drive-strength = <8>;
 			bias-pull-down;
 		};
 
-		led_5g {
+		wlan5g {
 			pins = "gpio9";
 			function = "gpio";
 			drive-strength = <8>;
@@ -630,21 +630,21 @@
 		pinctrl-0 = <&led_pins>;
 		pinctrl-names = "default";
 
-		led_sys: led_sys {
+		system {
 			gpio = <&tlmm 0 GPIO_ACTIVE_HIGH>;
-			label = "led_sys";
+			label = "system";
 			default-state = "on";
 		};
 
-		led_2g: led_2g {
+		wlan2g {
 			gpio = <&tlmm 2 GPIO_ACTIVE_HIGH>;
-			label = "led_2g";
+			label = "wlan2g";
 			default-state = "off";
 		};
 
-		led_5g: led_5g {
+		wlan5g {
 			gpio = <&tlmm 9 GPIO_ACTIVE_HIGH>;
-			label = "led_5g";
+			label = "wlan5g";
 			default-state = "off";
 		};
 	};
