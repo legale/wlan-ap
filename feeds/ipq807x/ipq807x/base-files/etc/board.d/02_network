@@ -109,6 +109,13 @@ qcom_setup_interfaces()
         ucidef_set_interface_wan "eth0"
         ucidef_set_interface_lan "eth1"
         ;;        
+ 	ikuai,sw8)
+		ucidef_set_interface_lan "eth0"
+		ucidef_set_interface_wan "eth1"
+		ucidef_add_switch "switch1"
+		ucidef_add_switch_attr "switch1" "enable" "false"
+		ucidef_add_switch_attr "switch1" "reset" "true"
+		;;
 	qcom,ipq5018-mp03.1)
 		ucidef_set_interface_lan "eth1"
 		ucidef_set_interface_wan "eth0"

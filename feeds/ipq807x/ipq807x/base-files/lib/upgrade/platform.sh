@@ -166,6 +166,7 @@ platform_check_image() {
  	optimcloud,d60-5g|\
  	optimcloud,d50|\
  	optimcloud,d50-5g|\
+ 	ikuai,sw8|\
 	qcom,ipq5018-mp03.3)
 		[ "$magic_long" = "73797375" ] && return 0
 		;;
@@ -206,6 +207,7 @@ platform_do_upgrade() {
  	optimcloud,d60-5g|\
  	optimcloud,d50|\
  	optimcloud,d50-5g|\
+ 	ikuai,sw8|\
 	qcom,ipq5018-mp03.3|\
 	wallys,dr5018|\
 	wallys,dr6018|\

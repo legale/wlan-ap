@@ -178,6 +178,19 @@ define Device/optimcloud_d50-5g
 endef
 TARGET_DEVICES += optimcloud_d50-5g
  
+define Device/ikuai_sw8
+   DEVICE_TITLE := ikuai sw8
+   DEVICE_DTS := qcom-ipq5018-ikuai-sw8
+   SUPPORTED_DEVICES := ikuai,sw8
+   DEVICE_PACKAGES := ath11k-wifi-ikuai-sw8 ath11k-firmware-ipq50xx ath11k-firmware-qcn9000 
+   DEVICE_DTS_CONFIG := config@mp03.1
+   IMAGES := sysupgrade.tar nand-factory.bin nand-factory.ubi
+   IMAGE/sysupgrade.tar := sysupgrade-tar | append-metadata
+   IMAGE/nand-factory.bin := append-ubi | qsdk-ipq-factory-nand
+   IMAGE/nand-factory.ubi := append-ubi
+endef
+TARGET_DEVICES += ikuai_sw8
+
 define Device/optimcloud_d50
    DEVICE_TITLE := OptimCloud D50
    DEVICE_DTS := qcom-ipq5018-optimcloud-d50
