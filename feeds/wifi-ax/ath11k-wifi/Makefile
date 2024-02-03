@@ -133,6 +133,11 @@ $(call Package/ath11k-wifi-default)
     TITLE:=optimcloud d50 bdf
 endef
 
+define Package/ath11k-wifi-ikuai-sw8
+$(call Package/ath11k-wifi-default)
+    TITLE:=ikuai sw8 bdf
+endef
+
 define Package/ath11k-wifi-optimcloud-d60
 $(call Package/ath11k-wifi-default)
     TITLE:=optimcloud d60 bdf
@@ -291,6 +296,13 @@ define Package/ath11k-wifi-optimcloud-d50/install
 	$(INSTALL_DATA) ./board-optimcloud-d50.bin.QCN9074 $(1)/lib/firmware/ath11k/QCN9074/hw1.0/board.bin
 endef
 
+define Package/ath11k-wifi-ikuai-sw8/install
+	$(INSTALL_DIR) $(1)/lib/firmware/ath11k/IPQ5018/hw1.0/
+	$(INSTALL_DIR) $(1)/lib/firmware/ath11k/QCN9074/hw1.0/
+	$(INSTALL_DATA) ./board-ikuai-sw8.bin.IPQ5018 $(1)/lib/firmware/ath11k/IPQ5018/hw1.0/board.bin
+	$(INSTALL_DATA) ./board-ikuai-sw8.bin.QCN9074 $(1)/lib/firmware/ath11k/QCN9074/hw1.0/board.bin
+endef
+
 define Package/ath11k-wifi-optimcloud-d60/install
 	$(INSTALL_DIR) $(1)/lib/firmware/ath11k/IPQ5018/hw1.0/
 	$(INSTALL_DIR) $(1)/lib/firmware/ath11k/QCN9074/hw1.0/
@@ -413,6 +425,7 @@ $(eval $(call BuildPackage,ath11k-wifi-cig-wf196_6g-ca))
 $(eval $(call BuildPackage,ath11k-wifi-cig-wf196_6g-us))
 $(eval $(call BuildPackage,ath11k-wifi-motorola-q14))
 $(eval $(call BuildPackage,ath11k-wifi-optimcloud-d50))
+$(eval $(call BuildPackage,ath11k-wifi-ikuai-sw8))
 $(eval $(call BuildPackage,ath11k-wifi-optimcloud-d60))
 $(eval $(call BuildPackage,ath11k-wifi-hfcl-ion4xi))
 $(eval $(call BuildPackage,ath11k-wifi-hfcl-ion4xi_wp))

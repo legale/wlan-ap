@@ -132,18 +132,18 @@ endef
 
 $(eval $(call KernelPackage,nf-nat))
 
-
 define KernelPackage/nf-nat6
   SUBMENU:=$(NF_MENU)
   TITLE:=Netfilter IPV6-NAT
-  KCONFIG:=$(KCONFIG_NF_NAT6)
+  KCONFIG:=$(KCONFIG_NF_NAT6) CONFIG_NF_NAT6=m CONFIG_NFT_CHAIN_NAT_IPV6=m
   DEPENDS:=@IPV6 +kmod-nf-conntrack6 +kmod-nf-nat
   FILES:=$(foreach mod,$(NF_NAT6-m),$(LINUX_DIR)/net/$(mod).ko)
   AUTOLOAD:=$(call AutoProbe,$(notdir $(NF_NAT6-m)))
 endef
 
 $(eval $(call KernelPackage,nf-nat6))
-
+$(info debugnat NF_NAT6-m is $(NF_NAT6-m))
+$(info debugnat FILES for nf-nat6 is $(FILES))
 
 define KernelPackage/nf-flow
   SUBMENU:=$(NF_MENU)
@@ -471,7 +471,7 @@ $(eval $(call KernelPackage,ipt-raw))
 
 define KernelPackage/ipt-raw6
   TITLE:=Netfilter IPv6 raw table support
-  DEPENDS:=@IPV6
+  DEPENDS:=@IPV6 +
   KCONFIG:=CONFIG_IP6_NF_RAW
   FILES:=$(LINUX_DIR)/net/ipv6/netfilter/ip6table_raw.ko
   AUTOLOAD:=$(call AutoProbe,ip6table_raw)
@@ -483,8 +483,8 @@ $(eval $(call KernelPackage,ipt-raw6))
 
 define KernelPackage/ipt-nat6
   TITLE:=IPv6 NAT targets
-  DEPENDS:=@IPV6
-  KCONFIG:=$(KCONFIG_IPT_NAT6)
+  DEPENDS:=@IPV6 
+  KCONFIG:=$(KCONFIG_IPT_NAT6) CONFIG_IP6_NF_TARGET_MASQUERADE=m
   FILES:=$(foreach mod,$(IPT_NAT6-m),$(LINUX_DIR)/net/$(mod).ko)
   AUTOLOAD:=$(call AutoLoad,43,$(notdir $(IPT_NAT6-m)))
   $(call AddDepends/ipt,+kmod-nf-nat6)
