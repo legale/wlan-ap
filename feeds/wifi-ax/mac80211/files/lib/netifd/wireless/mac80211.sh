@@ -852,7 +852,14 @@ mac80211_prepare_vif() {
 	local failed=
 	set_default wds 0
 	set_default powersave 0
+	json_select ..
 
+	[ "$mode" == "ap" ] && {
+		[ -z "$config_wpa_psk_file" ] && hostapd_set_psk "$ifname"
+		[ -z "$config_vlan_file" ] && hostapd_set_vlan "$ifname"
+	}
+	
+	json_select config
 	# It is far easier to delete and create the desired interface
 	case "$mode" in
 		mesh)
@@ -905,10 +912,6 @@ mac80211_prepare_vif() {
 
 	json_select ..
 
-	[ "$mode" == "ap" ] && {
-		[ -z "$config_wpa_psk_file" ] && hostapd_set_psk "$ifname"
-		[ -z "$config_vlan_file" ] && hostapd_set_vlan "$ifname"
-	}
 }
 
 mac80211_setup_vif() {
