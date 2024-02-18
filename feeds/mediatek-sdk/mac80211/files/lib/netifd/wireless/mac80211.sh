@@ -26,8 +26,8 @@ drv_mac80211_init_device_config() {
 	config_add_string tx_burst
 	config_add_string distance
 	config_add_int beacon_int chanbw frag rts
-	config_add_int rxantenna txantenna txpower min_tx_power
-	config_add_int num_global_macaddr multiple_bssid
+	config_add_int rxantenna txantenna antenna_gain txpower min_tx_power
+	config_add_int num_global_macaddr
 	config_add_boolean noscan ht_coex acs_exclude_dfs background_radar
 	config_add_array ht_capab
 	config_add_array channels
@@ -49,8 +49,6 @@ drv_mac80211_init_device_config() {
 		rx_antenna_pattern \
 		tx_antenna_pattern \
 		he_spr_sr_control \
-		he_spr_psr_enabled \
-		he_bss_color_enabled \
 		he_twt_required
 	config_add_int \
 		beamformer_antennas \
@@ -83,6 +81,8 @@ drv_mac80211_init_iface_config() {
 	config_add_int max_listen_int
 	config_add_int dtim_period
 	config_add_int start_disabled
+
+	config_add_int fils_discovery_max_interval
 
 	# mesh
 	config_add_string mesh_id
@@ -488,7 +488,6 @@ ${channel:+channel=$channel}
 ${channel_list:+chanlist=$channel_list}
 ${hostapd_noscan:+noscan=1}
 ${tx_burst:+tx_queue_data2_burst=$tx_burst}
-${multiple_bssid:+mbssid=$multiple_bssid}
 #num_global_macaddr=$num_global_macaddr
 $base_cfg
 
@@ -507,15 +506,25 @@ mac80211_hostapd_setup_bss() {
 
 	hostapd_set_bss_options hostapd_cfg "$phy" "$vif" || return 1
 	json_get_vars wds wds_bridge dtim_period max_listen_int start_disabled
+	json_get_vars fils_discovery_max_interval
 
 	set_default wds 0
 	set_default start_disabled 0
+	set_default fils_discovery_max_interval 0
 
 	[ "$wds" -gt 0 ] && {
 		append hostapd_cfg "wds_sta=1" "$N"
 		[ -n "$wds_bridge" ] && append hostapd_cfg "wds_bridge=$wds_bridge" "$N"
 	}
 	[ "$staidx" -gt 0 -o "$start_disabled" -eq 1 ] && append hostapd_cfg "start_disabled=1" "$N"
+
+	[ "$band" = "6g" ] && {
+		if [ "$fils_discovery_max_interval" -gt 0 ] && [ "$fils_discovery_max_interval" -le 20 ]; then
+			append hostapd_cfg "fils_discovery_max_interval=$fils_discovery_max_interval" "$N"
+		else
+			append hostapd_cfg "fils_discovery_max_interval=20" "$N"
+		fi
+	}
 
 	cat >> /var/run/hostapd-$phy.conf <<EOF
 $hostapd_cfg
@@ -537,80 +546,18 @@ mac80211_generate_mac() {
 	local phy="$1"
 	local id="${macidx:-0}"
 
-	wdev_tool "$phy" get_macaddr id=$id num_global=$num_global_macaddr mbssid=${multiple_bssid:-0}
+	wdev_tool "$phy" get_macaddr id=$id num_global=$num_global_macaddr mbssid=$multiple_bssid
 }
-
-get_board_phy_name() (
-	local path="$1"
-	local fallback_phy=""
-
-	__check_phy() {
-		local val="$1"
-		local key="$2"
-		local ref_path="$3"
-
-		json_select "$key"
-		json_get_values path
-		json_select ..
-
-		[ "${ref_path%+*}" = "$path" ] && fallback_phy=$key
-		[ "$ref_path" = "$path" ] || return 0
-
-		echo "$key"
-		exit
-	}
-
-	json_load_file /etc/board.json
-	json_for_each_item __check_phy wlan "$path"
-	[ -n "$fallback_phy" ] && echo "${fallback_phy}.${path##*+}"
-)
-
-rename_board_phy_by_path() {
-	local path="$1"
-
-	local new_phy="$(get_board_phy_name "$path")"
-	[ -z "$new_phy" -o "$new_phy" = "$phy" ] && return
-
-	iw "$phy" set name "$new_phy" && phy="$new_phy"
-}
-
-rename_board_phy_by_name() (
-	local phy="$1"
-	local suffix="${phy##*.}"
-	[ "$suffix" = "$phy" ] && suffix=
-
-	json_load_file /etc/board.json
-	json_select wlan
-	json_select "${phy%.*}" || return 0
-	json_get_values path
-
-	prev_phy="$(iwinfo nl80211 phyname "path=$path${suffix:++$suffix}")"
-	[ -n "$prev_phy" ] || return 0
-
-	[ "$prev_phy" = "$phy" ] && return 0
-
-	iw "$prev_phy" set name "$phy"
-)
 
 find_phy() {
-	[ -n "$phy" ] && {
-		rename_board_phy_by_name "$phy"
-		[ -d /sys/class/ieee80211/$phy ] && return 0
-	}
+	[ -n "$phy" -a -d /sys/class/ieee80211/$phy ] && return 0
 	[ -n "$path" ] && {
 		phy="$(iwinfo nl80211 phyname "path=$path")"
-		[ -n "$phy" ] && {
-			rename_board_phy_by_path "$path"
-			return 0
-		}
+		[ -n "$phy" ] && return 0
 	}
 	[ -n "$macaddr" ] && {
 		for phy in $(ls /sys/class/ieee80211 2>/dev/null); do
-			grep -i -q "$macaddr" "/sys/class/ieee80211/${phy}/macaddress" && {
-				path="$(iwinfo nl80211 path "$phy")"
-				rename_board_phy_by_path "$path"
-				return 0
-			}
+			grep -i -q "$macaddr" "/sys/class/ieee80211/${phy}/macaddress" && return 0
 		done
 	}
 	return 1
@@ -620,60 +567,10 @@ mac80211_check_ap() {
 	has_ap=1
 }
 
-mac80211_prepare_vif() {
-	json_select config
-
-	json_get_vars ifname mode ssid wds powersave macaddr enable wpa_psk_file vlan_file
-
+mac80211_set_ifname() {
+	local phy="$1"
 	[ -n "$ifname" ] || ifname="wlan${phy#phy}${if_idx:+-$if_idx}"
 	if_idx=$((${if_idx:-0} + 1))
-
-	append active_ifnames "$ifname"
-	set_default wds 0
-	set_default powersave 0
-	json_add_string _ifname "$ifname"
-
-	default_macaddr=
-	if [ -z "$macaddr" ]; then
-		macaddr="$(mac80211_generate_mac $phy)"
-		macidx="$(($macidx + 1))"
-		default_macaddr=1
-	elif [ "$macaddr" = 'random' ]; then
-		macaddr="$(macaddr_random)"
-	fi
-	json_add_string _macaddr "$macaddr"
-	json_add_string _default_macaddr "$default_macaddr"
-	json_select ..
-
-
-	[ "$mode" == "ap" ] && {
-		[ -z "$wpa_psk_file" ] && hostapd_set_psk "$ifname"
-		[ -z "$vlan_file" ] && hostapd_set_vlan "$ifname"
-	}
-
-	json_select config
-
-	# It is far easier to delete and create the desired interface
-	case "$mode" in
-		ap)
-			# Hostapd will handle recreating the interface and
-			# subsequent virtual APs belonging to the same PHY
-			if [ -n "$hostapd_ctrl" ]; then
-				type=bss
-			else
-				type=interface
-			fi
-
-			mac80211_hostapd_setup_bss "$phy" "$ifname" "$macaddr" "$type" || return
-
-			[ -n "$hostapd_ctrl" ] || {
-				ap_ifname="${ifname}"
-				hostapd_ctrl="${hostapd_ctrl:-/var/run/hostapd/$ifname}"
-			}
-		;;
-	esac
-
-	json_select ..
 }
 
 mac80211_prepare_iw_htmode() {
@@ -818,17 +715,6 @@ mac80211_setup_monitor() {
 	json_set_namespace "$prev"
 }
 
-mac80211_set_vif_txpower() {
-	local name="$1"
-
-	json_select config
-	json_get_var ifname _ifname
-	json_get_vars vif_txpower
-	json_select ..
-
-	[ -z "$vif_txpower" ] || iw dev "$ifname" set txpower fixed "${vif_txpower%%.*}00"
-}
-
 wpa_supplicant_init_config() {
 	json_set_namespace wpa_supp prev
 
@@ -933,19 +819,48 @@ mac80211_setup_supplicant() {
 	return 0
 }
 
-mac80211_setup_vif() {
-	local name="$1"
-	local failed
-
+mac80211_prepare_vif() {
 	json_select config
-	json_get_var ifname _ifname
-	json_get_var macaddr _macaddr
-	json_get_var default_macaddr _default_macaddr
-	json_get_vars mode wds powersave
 
-	set_default powersave 0
+	json_get_vars ifname mode ssid wds powersave macaddr enable wpa_psk_file vlan_file
+	local config_wpa_psk_file="$wpa_psk_file"
+	local config_vlan_file="$vlan_file"
+
+	[ -n "$ifname" ] || {
+		local prefix;
+
+		case "$mode" in
+		ap|sta|mesh) prefix=$mode;;
+		adhoc) prefix=ibss;;
+		monitor) prefix=mon;;
+		esac
+
+		mac80211_set_ifname "$phy" "$prefix"
+	}
+
+	append active_ifnames "$ifname"
+
+	default_macaddr=
+	if [ -z "$macaddr" ]; then
+		macaddr="$(mac80211_generate_mac $phy)"
+		macidx="$(($macidx + 1))"
+		default_macaddr=1
+	elif [ "$macaddr" = 'random' ]; then
+		macaddr="$(macaddr_random)"
+	fi
+
+	local failed=
 	set_default wds 0
+	set_default powersave 0
+	json_select ..
 
+	[ "$mode" == "ap" ] && {
+		[ -z "$config_wpa_psk_file" ] && hostapd_set_psk "$ifname"
+		[ -z "$config_vlan_file" ] && hostapd_set_vlan "$ifname"
+	}
+	
+	json_select config
+	# It is far easier to delete and create the desired interface
 	case "$mode" in
 		mesh)
 			json_get_vars $MP_CONFIG_INT $MP_CONFIG_BOOL $MP_CONFIG_STRING
@@ -971,10 +886,45 @@ mac80211_setup_vif() {
 		monitor)
 			mac80211_setup_monitor
 		;;
+		ap)
+			# Hostapd will handle recreating the interface and
+			# subsequent virtual APs belonging to the same PHY
+			if [ -n "$hostapd_ctrl" ]; then
+				type=bss
+			else
+				type=interface
+			fi
+
+			mac80211_hostapd_setup_bss "$phy" "$ifname" "$macaddr" "$type" || return
+
+			[ -n "$hostapd_ctrl" ] || {
+				ap_ifname="${ifname}"
+				hostapd_ctrl="${hostapd_ctrl:-/var/run/hostapd/$ifname}"
+			}
+		;;
 	esac
 
+	[ -n "$failed" ] || {
+		json_add_string _ifname "$ifname"
+		json_add_string _macaddr "$macaddr"
+		json_add_string _default_macaddr "$default_macaddr"
+	}
+
 	json_select ..
-	[ -n "$failed" ] || wireless_add_vif "$name" "$ifname"
+
+}
+
+mac80211_setup_vif() {
+	local name="$1"
+
+	json_select config
+	json_get_var ifname _ifname
+	json_get_vars vif_txpower wds
+	json_select ..
+
+	[ -z "$vif_txpower" ] || iw dev "$ifname" set txpower fixed "${vif_txpower%%.*}00"
+	[ "$wds" -gt 0 ] && echo 1 > /sys/kernel/debug/ieee80211/$phy/netdev\:$ifname/disable_offload
+	[ -n "$ifname" ] && wireless_add_vif "$name" "$ifname"
 }
 
 get_freq() {
@@ -1031,10 +981,11 @@ drv_mac80211_setup() {
 	json_get_vars \
 		phy macaddr path \
 		country chanbw distance \
-		txpower \
+		txpower antenna_gain \
 		rxantenna txantenna \
 		frag rts beacon_int:100 htmode \
-		num_global_macaddr:1 multiple_bssid
+		multiple_bssid:0 \
+		num_global_macaddr
 	json_get_values basic_rate_list basic_rate
 	json_get_values scan_list scan_list
 	json_select ..
@@ -1050,6 +1001,8 @@ drv_mac80211_setup() {
 		wireless_set_retry 0
 		return 1
 	}
+	
+	[ "$band" = "6g" ] && set_default multiple_bssid 1
 
 	local wdev
 	local cwdev
@@ -1079,6 +1032,8 @@ drv_mac80211_setup() {
 	set_default rxantenna 0xffffffff
 	set_default txantenna 0xffffffff
 	set_default distance 0
+	set_default antenna_gain 0
+	set_default num_global_macaddr 1
 
 	[ "$txantenna" = "all" ] && txantenna=0xffffffff
 	[ "$rxantenna" = "all" ] && rxantenna=0xffffffff
@@ -1087,6 +1042,7 @@ drv_mac80211_setup() {
 	wireless_set_data phy="$phy" txantenna="$txantenna" rxantenna="$rxantenna"
 
 	iw phy "$phy" set antenna $txantenna $rxantenna >/dev/null 2>&1
+	iw phy "$phy" set antenna_gain $antenna_gain >/dev/null 2>&1
 	iw phy "$phy" set distance "$distance" >/dev/null 2>&1
 
 	if [ -n "$txpower" ]; then
@@ -1120,7 +1076,6 @@ drv_mac80211_setup() {
 	mac80211_prepare_iw_htmode
 	active_ifnames=
 	for_each_interface "ap sta adhoc mesh monitor" mac80211_prepare_vif
-	for_each_interface "ap sta adhoc mesh monitor" mac80211_setup_vif
 
 	[ -x /usr/sbin/wpa_supplicant ] && wpa_supplicant_set_config "$phy"
 	[ -x /usr/sbin/hostapd ] && hostapd_set_config "$phy"
@@ -1131,7 +1086,7 @@ drv_mac80211_setup() {
 	wdev_tool "$phy" set_config "$(json_dump)" $active_ifnames
 	json_set_namespace "$prev"
 
-	for_each_interface "ap sta adhoc mesh monitor" mac80211_set_vif_txpower
+	for_each_interface "ap sta adhoc mesh monitor" mac80211_setup_vif
 	wireless_set_up
 }
 
