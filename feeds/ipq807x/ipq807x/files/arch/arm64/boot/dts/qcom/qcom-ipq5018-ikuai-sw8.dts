@@ -24,6 +24,10 @@
 	AUTO_MOUNT;
 	#endif
 	aliases {
+		led-boot = &led_system;
+		led-failsafe = &led_system;
+		led-running = &led_system;
+		led-upgrade = &led_system;
 		sdhc1 = &sdhc_1; /* SDC1 eMMC slot */
 		serial0 = &blsp1_uart1;
 		serial1 = &blsp1_uart2;
@@ -512,21 +516,21 @@
 
 	leds_pins: leds_pinmux {
 
-		IoTled_blue {
+		led2_blue {
 			bias-pull-down;
 			drive-strength = <0x08>;
 			function = "gpio";
 			pins = "gpio19";
 		};
 
-		IoTled_green {
+		led2_green {
 			bias-pull-down;
 			drive-strength = <0x08>;
 			function = "gpio";
 			pins = "gpio38";
 		};
 
-		IoTled_red {
+		led2_red {
 			bias-pull-down;
 			drive-strength = <0x08>;
 			function = "gpio";
@@ -668,43 +672,42 @@
 		led@17 {
 			default-state = "off";
 			gpios = <&tlmm 0x11 0x00>;
-			label = "IoTled_red";
-			linux,default-trigger = "IoTled_red";
+			label = "led2_red";
+			color = "red";
 		};
 
 		led@19 {
 			default-state = "off";
 			gpios = <&tlmm 0x13 0x00>;
-			label = "IoTled_blue";
-			linux,default-trigger = "IoTled_blue";
+			label = "led2_blue";
+			color = "blue";
 		};
 
-		led@31 {
+		led_system: led@31 {
 			default-state = "off";
 			gpios = <&tlmm 0x1f 0x00>;
-			label = "sysled_red";
-			linux,default-trigger = "sysled_red";
+			label = "system";
+			color = "red";
 		};
 
 		led@32 {
 			default-state = "off";
 			gpios = <&tlmm 0x20 0x00>;
-			label = "sysled_green";
-			linux,default-trigger = "sysled_green";
+			label = "wlan2g";
+			color = "green";
 		};
 
 		led@33 {
 			default-state = "off";
 			gpios = <&tlmm 0x21 0x00>;
-			label = "sysled_blue";
-			linux,default-trigger = "timer";
+			label = "wlan5g";
+			color = "blue";
 		};
 
 		led@38 {
 			default-state = "off";
 			gpios = <&tlmm 0x26 0x00>;
-			label = "IoTled_green";
-			linux,default-trigger = "IoTled_green";
+			label = "led2_green";
 		};
 	};
 

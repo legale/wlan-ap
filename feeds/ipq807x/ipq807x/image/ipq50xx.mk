@@ -184,8 +184,8 @@ define Device/ikuai_sw8
    SUPPORTED_DEVICES := ikuai,sw8
    DEVICE_PACKAGES := ath11k-wifi-ikuai-sw8 ath11k-firmware-ipq50xx ath11k-firmware-qcn9000 
    DEVICE_DTS_CONFIG := config@mp03.1
-   IMAGES := sysupgrade.tar nand-factory.bin nand-factory.ubi
-   IMAGE/sysupgrade.tar := sysupgrade-tar | append-metadata
+   IMAGES := sysupgrade.bin nand-factory.bin nand-factory.ubi
+   IMAGE/sysupgrade.bin := sysupgrade-tar | append-metadata
    IMAGE/nand-factory.bin := append-ubi | qsdk-ipq-factory-nand
    IMAGE/nand-factory.ubi := append-ubi
 endef

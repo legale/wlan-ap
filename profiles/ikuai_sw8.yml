@@ -6,10 +6,11 @@ image: bin/targets/ipq807x/ipq50xx/openwrt-ipq5018-ikuai_sw8-squashfs-sysupgrade
 feeds:
   - name: ipq807x
     path: ../../feeds/ipq807x
+  - name: wda
+    path: /sdk1/wda_stable/openwrt
 include:
   - ucentral-ap
   - wifi-ax
-  - ucentral-ap
 packages:
   - ipq807x
 diffconfig: |
