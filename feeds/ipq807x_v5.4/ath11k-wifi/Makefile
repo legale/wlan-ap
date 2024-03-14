@@ -39,6 +39,7 @@ ALLWIFIBOARDS:= \
 	edgecore-eap102 \
 	edgecore-oap102 \
 	edgecore-eap104 \
+	noname-sw8-clone \
 	liteon-wpx8324 \
 	indio-um-310ax-v1 \
 	indio-um-510axp-v1 \
@@ -179,6 +180,11 @@ endef
 define Package/ath11k-wifi-cig-wf188n
 $(call Package/ath11k-wifi-default)
     TITLE:=cig-wf188n bdf
+endef
+
+define Package/ath11k-wifi-noname-sw8-clone
+$(call Package/ath11k-wifi-default)
+    TITLE:=noname-sw8-clone bdf
 endef
 
 define ath11k-wifi-install-one-to
@@ -362,6 +368,13 @@ define Package/ath11k-wifi-edgecore-oap101e/install
 	$(INSTALL_DATA) ./board-2-edgecore-oap101e.bin.QCN6122 $(1)/lib/firmware/ath11k/qcn6122/hw1.0/board-2.bin
 endef
 
+define Package/ath11k-wifi-noname-sw8-clone/install
+	$(INSTALL_DIR) $(1)/lib/firmware/ath11k/IPQ5018/hw1.0/
+	$(INSTALL_DIR) $(1)/lib/firmware/ath11k/qcn6122/hw1.0/
+	$(INSTALL_DATA) ./board-noname-sw8-clone.bin.IPQ5018 $(1)/lib/firmware/ath11k/IPQ5018/hw1.0/board.bin
+	$(INSTALL_DATA) ./board-noname-sw8-clone.bin.QCN6122 $(1)/lib/firmware/ath11k/qcn6122/hw1.0/board.bin
+endef
+
 define Package/ath11k-wifi-cig-wf188n/install
 	$(INSTALL_DIR) $(1)/lib/firmware/ath11k/IPQ6018/hw1.0/
 	$(INSTALL_DATA) ./board-cig-wf188n-ca.bin.IPQ6018 $(1)/lib/firmware/ath11k/IPQ6018/hw1.0/board.bin.CA
@@ -416,3 +429,4 @@ $(eval $(call BuildPackage,ath11k-wifi-hfcl-ion4xi_HMR))
 $(eval $(call BuildPackage,ath11k-wifi-edgecore-oap101))
 $(eval $(call BuildPackage,ath11k-wifi-edgecore-oap101e))
 $(eval $(call BuildPackage,ath11k-wifi-cig-wf188n))
+$(eval $(call BuildPackage,ath11k-wifi-noname-sw8-clone))
