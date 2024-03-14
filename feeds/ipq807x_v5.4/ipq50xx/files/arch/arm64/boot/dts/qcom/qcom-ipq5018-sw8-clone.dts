@@ -25,255 +25,129 @@
 
 	chosen {
 		bootargs = "console=ttyMSM0,115200,n8 rw init=/init";
-		bootargs-append = " swiotlb=1 coherent_pool=2M";
+		bootargs-append = " root=/dev/ubiblock0_1 swiotlb=1 coherent_pool=2M";
 		stdout-path = "serial0";
 	};
 
 	reserved-memory {
-	#ifdef __IPQ_MEM_PROFILE_256_MB__
-	/*		   256 MB Profile
-	 * +==========+==============+=========================+
-	 * |	  |	      |			 |
-	 * |  Region  | Start Offset |	  Size	   |
-	 * |	  |	      |			 |
-	 * +----------+--------------+-------------------------+
-	 * |    NSS   |  0x40000000  |	   8MB	   |
-	 * +----------+--------------+-------------------------+
-	 * |   Linux  |  0x40800000  | Depends on total memory |
-	 * +----------+--------------+-------------------------+
-	 * |   uboot  |  0x4A600000  |	   4MB	   |
-	 * +----------+--------------+-------------------------+
-	 * |    SBL   |  0x4AA00000  |	   1MB	   |
-	 * +----------+--------------+-------------------------+
-	 * |   smem   |  0x4AB00000  |	   1MB	   |
-	 * +----------+--------------+-------------------------+
-	 * |    TZ    |  0x4AC00000  |	   4MB	   |
-	 * +----------+--------------+-------------------------+
-	 * |    Q6    |	      |			 |
-	 * |   code/  |  0x4B000000  |	  20MB	   |
-	 * |   data   |	      |			 |
-	 * +----------+--------------+-------------------------+
-	 * |  IPQ5018 |	      |			 |
-	 * |   data   |  0x4C400000  |	  13MB	   |
-	 * +----------+--------------+-------------------------+
-	 * |  IPQ5018 |	      |			 |
-	 * |  M3 Dump |  0x4D100000  |	   1MB	   |
-	 * +----------+--------------+-------------------------+
-	 * |  IPQ5018 |	      |			 |
-	 * |   QDSS   |  0x4D200000  |	   1MB	   |
-	 * +----------+--------------+-------------------------+
-	 * | QCN6122_1|	      |			 |
-	 * |   data   |  0x4D300000  |	  13MB	   |
-	 * +----------+--------------+-------------------------+
-	 * | QCN6122_1|	      |			 |
-	 * |  M3 Dump |  0x4E000000  |	   1MB	   |
-	 * +----------+--------------+-------------------------+
-	 * | QCN6122_1|	      |			 |
-	 * |   QDSS   |  0x4E100000  |	   1MB	   |
-	 * +----------+--------------+-------------------------+
-	 * | QCN6122_2|	      |			 |
-	 * |   data   |  0x4E200000  |	  13MB	   |
-	 * +----------+--------------+-------------------------+
-	 * | QCN6122_2|	      |			 |
-	 * |  M3 Dump |  0x4EF00000  |	   1MB	   |
-	 * +----------+--------------+-------------------------+
-	 * | QCN6122_2|	      |			 |
-	 * |   QDSS   |  0x4F000000  |	   1MB	   |
-	 * +----------+--------------+-------------------------+
-	 * |						   |
-	 * |	    Rest of the memory for Linux	   |
-	 * |						   |
-	 * +===================================================+
-	 */
-		q6_mem_regions: q6_mem_regions@4B000000 {
+		#address-cells = <0x02>;
+		#size-cells = <0x02>;
+		ranges;
+
+		bt@7000000 {
 			no-map;
-			reg = <0x0 0x4B000000 0x0 0x4100000>;
+			reg = <0x00 0x7000000 0x00 0x58000>;
+		};
+
+		m3_dump: m3_dump@4D200000 {
+			no-map;
+			reg = <0x00 0x4d200000 0x00 0x100000>;
+		};
+
+		m3_dump_qcn6122_1: m3_dump_qcn6122_1@4E600000 {
+			no-map;
+			reg = <0x00 0x4e600000 0x00 0x100000>;
+		};
+
+		m3_dump_qcn6122_2: m3_dump_qcn6122_2@4FD00000 {
+			no-map;
+			reg = <0x00 0x4fd00000 0x00 0x100000>;
+		};
+
+		nss: nss@40000000 {
+			no-map;
+			reg = <0x00 0x40000000 0x00 0x1000000>;
+		};
+
+		q6_caldb_region: q6_caldb_region@4D400000 {
+			no-map;
+			reg = <0x00 0x4d400000 0x00 0x200000>;
 		};
 
 		q6_code_data: q6_code_data@4B000000 {
 			no-map;
-			reg = <0x0 0x4B000000 0x0 0x1400000>;
-		};
-
-		q6_ipq5018_data: q6_ipq5018_data@4C400000 {
-			no-map;
-			reg = <0x0 0x4C400000 0x0 0xD00000>;
-		};
-
-		m3_dump: m3_dump@4D100000 {
-			no-map;
-			reg = <0x0 0x4D100000 0x0 0x100000>;
+			reg = <0x00 0x4b000000 0x00 0x60000>;
 		};
 
 		q6_etr_region: q6_etr_dump@4D200000 {
 			no-map;
-			reg = <0x0 0x4D200000 0x0 0x100000>;
+			reg = <0x00 0x4d200000 0x00 0x100000>;
 		};
 
-		q6_qcn6122_data1: q6_qcn6122_data1@4D300000 {
+		q6_ipq5018_data: q6_ipq5018_data@4C400000 {
 			no-map;
-			reg = <0x0 0x4D300000 0x0 0xD00000>;
+			reg = <0x00 0x4c400000 0x00 0xd00000>;
 		};
 
-		m3_dump_qcn6122_1: m3_dump_qcn6122_1@4E000000 {
-			no-map;
-			reg = <0x0 0x4E000000 0x0 0x100000>;
-		};
-
-		q6_qcn6122_etr_1: q6_qcn6122_etr_1@4E100000 {
-			no-map;
-			reg = <0x0 0x4E100000 0x0 0x100000>;
-		};
-
-		q6_qcn6122_data2: q6_qcn6122_data2@4E200000 {
-			no-map;
-			reg = <0x0 0x4E200000 0x0 0xD00000>;
-		};
-
-		m3_dump_qcn6122_2: m3_dump_qcn6122_2@4EF00000 {
-			no-map;
-			reg = <0x0 0x4EF00000 0x0 0x100000>;
-		};
-
-		q6_qcn6122_etr_2: q6_qcn6122_etr_2@4F000000 {
-			no-map;
-			reg = <0x0 0x4F000000 0x0 0x100000>;
-		};
-	#else
-	/*		 512MB/1GB Profiles
-	 * +==========+==============+=========================+
-	 * |	  |	      |			 |
-	 * |  Region  | Start Offset |	  Size	   |
-	 * |	  |	      |			 |
-	 * +----------+--------------+-------------------------+
-	 * |    NSS   |  0x40000000  |	  16MB	   |
-	 * +----------+--------------+-------------------------+
-	 * |   Linux  |  0x41000000  | Depends on total memory |
-	 * +----------+--------------+-------------------------+
-	 * |   uboot  |  0x4A600000  |	   4MB	   |
-	 * +----------+--------------+-------------------------+
-	 * |    SBL   |  0x4AA00000  |	   1MB	   |
-	 * +----------+--------------+-------------------------+
-	 * |   smem   |  0x4AB00000  |	   1MB	   |
-	 * +----------+--------------+-------------------------+
-	 * |    TZ    |  0x4AC00000  |	   4MB	   |
-	 * +----------+--------------+-------------------------+
-	 * |    Q6    |	      |			 |
-	 * |   code/  |  0x4B000000  |	  20MB	   |
-	 * |   data   |	      |			 |
-	 * +----------+--------------+-------------------------+
-	 * |  IPQ5018 |	      |			 |
-	 * |   data   |  0x4C400000  |	  13MB	   |
-	 * +----------+--------------+-------------------------+
-	 * |  IPQ5018 |	      |			 |
-	 * |  M3 Dump |  0x4D100000  |	   1MB	   |
-	 * +----------+--------------+-------------------------+
-	 * |  IPQ5018 |	      |			 |
-	 * |   QDSS   |  0x4D200000  |	   1MB	   |
-	 * +----------+--------------+-------------------------+
-	 * |  IPQ5018 |	      |			 |
-	 * |  Caldb   |  0x4D300000  |	   2MB	   |
-	 * +----------+--------------+-------------------------+
-	 * | QCN6122_1|	      |			 |
-	 * |   data   |  0x4D500000  |	  13MB	   |
-	 * +----------+--------------+-------------------------+
-	 * | QCN6122_1|	      |			 |
-	 * |  M3 Dump |  0x4E200000  |	   1MB	   |
-	 * +----------+--------------+-------------------------+
-	 * | QCN6122_1|	      |			 |
-	 * |   QDSS   |  0x4E300000  |	   1MB	   |
-	 * +----------+--------------+-------------------------+
-	 * | QCN6122_1|	      |			 |
-	 * |  Caldb   |  0x4E400000  |	   5MB	   |
-	 * +----------+--------------+-------------------------+
-	 * | QCN6122_2|	      |			 |
-	 * |   data   |  0x4E900000  |	  13MB	   |
-	 * +----------+--------------+-------------------------+
-	 * | QCN6122_2|	      |			 |
-	 * |  M3 Dump |  0x4F600000  |	   1MB	   |
-	 * +----------+--------------+-------------------------+
-	 * | QCN6122_2|	      |			 |
-	 * |   QDSS   |  0x4F700000  |	   1MB	   |
-	 * +----------+--------------+-------------------------+
-	 * | QCN6122_2|	      |			 |
-	 * |  Caldb   |  0x4F800000  |	   5MB	   |
-	 * +----------+--------------+-------------------------+
-	 * |						   |
-	 * |	    Rest of the memory for Linux	   |
-	 * |						   |
-	 * +===================================================+
-	 */
 		q6_mem_regions: q6_mem_regions@4B000000 {
 			no-map;
-			reg = <0x0 0x4B000000 0x0 0x4D00000>;
+			reg = <0x00 0x4b000000 0x00 0x3400000>;
 		};
 
-		q6_code_data: q6_code_data@4B000000 {
+		q6_qcn6122_caldb_1: q6_qcn6122_caldb_1@4E800000 {
+			linux,phandle = <0x1c>;
 			no-map;
-			reg = <0x0 0x4B000000 0x0 01400000>;
+			phandle = <0x1c>;
+			reg = <0x00 0x4e800000 0x00 0x500000>;
 		};
 
-		q6_ipq5018_data: q6_ipq5018_data@4C400000 {
+		q6_qcn6122_caldb_2: q6_qcn6122_caldb_2@4FF00000 {
 			no-map;
-			reg = <0x0 0x4C400000 0x0 0xD00000>;
+			reg = <0x00 0x4ff00000 0x00 0x500000>;
 		};
 
-		m3_dump: m3_dump@4D100000 {
+		q6_qcn6122_data1: q6_qcn6122_data1@4D600000 {
+			linux,phandle = <0x19>;
 			no-map;
-			reg = <0x0 0x4D100000 0x0 0x100000>;
-		};
-
-		q6_etr_region: q6_etr_dump@4D200000 {
-			no-map;
-			reg = <0x0 0x4D200000 0x0 0x100000>;
-		};
-
-		q6_caldb_region: q6_caldb_region@4D300000 {
-			no-map;
-			reg = <0x0 0x4D300000 0x0 0x200000>;
-		};
-
-		q6_qcn6122_data1: q6_qcn6122_data1@4D500000 {
-			no-map;
-			reg = <0x0 0x4D500000 0x0 0xD00000>;
-		};
-
-		m3_dump_qcn6122_1: m3_dump_qcn6122_1@4E200000 {
-			no-map;
-			reg = <0x0 0x4E200000 0x0 0x100000>;
-		};
-
-		q6_qcn6122_etr_1: q6_qcn6122_etr_1@4E300000 {
-			no-map;
-			reg = <0x0 0x4E300000 0x0 0x100000>;
-		};
-
-		q6_qcn6122_caldb_1: q6_qcn6122_caldb_1@4E400000 {
-			no-map;
-			reg = <0x0 0x4E400000 0x0 0x500000>;
+			phandle = <0x19>;
+			reg = <0x00 0x4d600000 0x00 0x1000000>;
 		};
 
 		q6_qcn6122_data2: q6_qcn6122_data2@4E900000 {
 			no-map;
-			reg = <0x0 0x4E900000 0x0 0xD00000>;
+			reg = <0x00 0x4ed00000 0x00 0x1000000>;
 		};
 
-		m3_dump_qcn6122_2: m3_dump_qcn6122_2@4F600000 {
+		q6_qcn6122_etr_1: q6_qcn6122_etr_1@4E700000 {
+			linux,phandle = <0x1b>;
 			no-map;
-			reg = <0x0 0x4F600000 0x0 0x100000>;
+			phandle = <0x1b>;
+			reg = <0x00 0x4e700000 0x00 0x100000>;
 		};
 
-		q6_qcn6122_etr_2: q6_qcn6122_etr_2@4F700000 {
+		q6_qcn6122_etr_2: q6_qcn6122_etr_2@4FE00000 {
 			no-map;
-			reg = <0x0 0x4F700000 0x0 0x100000>;
+			reg = <0x00 0x4fe00000 0x00 0x100000>;
 		};
 
-		q6_qcn6122_caldb_2: q6_qcn6122_caldb_2@4F800000 {
+		sbl@4aa00000 {
 			no-map;
-			reg = <0x0 0x4F800000 0x0 0x500000>;
+			reg = <0x00 0x4aa00000 0x00 0x100000>;
 		};
 
-	#endif
+		smem@4ab00000 {
+			no-map;
+			reg = <0x00 0x4ab00000 0x00 0x100000>;
+		};
+
+		tz@4ac00000 {
+			no-map;
+			reg = <0x00 0x4ac00000 0x00 0x400000>;
+		};
+
+		tzapp@4a400000 {
+			no-map;
+		};
+
+		tzapp_data@4a700000 {
+			compatible = "shared-dma-pool";
+			no-map;
+		};
+
+		uboot@4a800000 {
+			no-map;
+			reg = <0x00 0x4a800000 0x00 0x200000>;
+		};
 	};
 
 	soc {
@@ -711,12 +585,7 @@
 		"gcc_q6_ahb_s_clk",
 		"gcc_wcss_axi_s_clk";
 
-	#ifdef __IPQ_MEM_PROFILE_256_MB__
-		memory-region = <&q6_mem_regions>, <&q6_etr_region>;
-	#else
-		memory-region = <&q6_mem_regions>, <&q6_etr_region>,
-				<&q6_caldb_region>;
-	#endif
+		memory-region = <&q6_mem_regions>, <&q6_etr_region>, <&q6_caldb_region>;
 
 	qcom,rproc = <&q6v5_wcss>;
 	qcom,bootargs_smem = <507>;
@@ -760,13 +629,7 @@
 		qcom,smem-state-names = "shutdown",
 					"stop",
 					"spawn";
-	#ifdef __IPQ_MEM_PROFILE_256_MB__
-		memory-region = <&q6_ipq5018_data>, <&m3_dump>,
-				<&q6_etr_region>;
-	#else
-		memory-region = <&q6_ipq5018_data>, <&m3_dump>,
-				<&q6_etr_region>, <&q6_caldb_region>;
-	#endif
+		memory-region = <&q6_ipq5018_data>, <&m3_dump>, <&q6_etr_region>, <&q6_caldb_region>;
 
 	};
 
@@ -837,20 +700,9 @@
 	qcom,multipd_arch;
 	qcom,rproc = <&q6_wcss_pd1>;
 	qcom,userpd-subsys-name = "q6v5_wcss_userpd1";
-#ifdef __IPQ_MEM_PROFILE_256_MB__
-	qcom,tgt-mem-mode = <2>;
-#else
 	qcom,tgt-mem-mode = <1>;
-#endif
 	qcom,board_id = <0x23>;
-#ifdef __CNSS2__
-	qcom,bdf-addr = <0x4C400000 0x4C400000 0x4C400000 0x0 0x0>;
-	qcom,caldb-addr = <0x4D300000 0x4D300000 0 0 0>;
-	qcom,caldb-size = <0x200000>;
-	mem-region = <&q6_ipq5018_data>;
-#else
 	memory-region = <&q6_ipq5018_data>;
-#endif
 	status = "ok";
 };
 
@@ -859,21 +711,10 @@
 	qcom,multipd_arch;
 	qcom,userpd-subsys-name = "q6v5_wcss_userpd2";
 	qcom,rproc = <&q6_wcss_pd2>;
-#ifdef __IPQ_MEM_PROFILE_256_MB__
-	qcom,tgt-mem-mode = <2>;
-#else
 	qcom,tgt-mem-mode = <1>;
-#endif
 	qcom,board_id = <0x60>;
-#ifdef __CNSS2__
-	qcom,bdf-addr = <0x4D500000 0x4D500000 0x4D300000 0x0 0x0>;
-	qcom,caldb-addr = <0x4E400000 0x4E400000 0 0 0>;
-	qcom,caldb-size = <0x500000>;
-	mem-region = <&q6_qcn6122_data1>;
-#else
 	memory-region = <&q6_qcn6122_data1>;
-#endif
-	status = "disabled";
+	status = "ok";
 };
 
 &wifi2 {
@@ -881,21 +722,10 @@
 	qcom,multipd_arch;
 	qcom,userpd-subsys-name = "q6v5_wcss_userpd3";
 	qcom,rproc = <&q6_wcss_pd3>;
-#ifdef __IPQ_MEM_PROFILE_256_MB__
-	qcom,tgt-mem-mode = <2>;
-#else
 	qcom,tgt-mem-mode = <1>;
-#endif
 	qcom,board_id = <0xb0>;
-#ifdef __CNSS2__
-	qcom,bdf-addr = <0x4E900000 0x4E900000 0x4E200000 0x0 0x0>;
-	qcom,caldb-addr = <0x4F800000 0x4F800000 0 0 0>;
-	qcom,caldb-size = <0x500000>;
-	mem-region = <&q6_qcn6122_data2>;
-#else
 	memory-region = <&q6_qcn6122_data2>;
-#endif
-	status = "ok";
+	status = "disabled";
 };
 
 &usb3 {
