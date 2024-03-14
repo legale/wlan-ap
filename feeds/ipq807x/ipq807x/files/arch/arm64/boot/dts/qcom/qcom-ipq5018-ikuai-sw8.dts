@@ -246,6 +246,7 @@
 			mdio-bus = <&mdio0>;
 			local-mac-address = [000000000000];
 			phy-mode = "sgmii";
+			label = "lan";
 		};
 		dp1 {
 			device_type = "network";
@@ -261,6 +262,7 @@
 			mdio-bus = <&mdio1>;
 			local-mac-address = [000000000000];
 			phy-mode = "sgmii";
+			label = "wan";
 		};
 		rpm_etm0 {
 			status = "disabled";
