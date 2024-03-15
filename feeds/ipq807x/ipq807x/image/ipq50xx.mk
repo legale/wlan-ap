@@ -1,22 +1,23 @@
 KERNEL_LOADADDR := 0x41208000
 
 define Device/FitImage
-        KERNEL_SUFFIX := -uImage.itb
-        KERNEL = kernel-bin | libdeflate-gzip | fit gzip $$(KDIR)/image-$$(DEVICE_DTS).dtb
-        KERNEL_NAME := Image
+	KERNEL_SUFFIX := -uImage.itb
+	KERNEL = kernel-bin | libdeflate-gzip | fit gzip $$(KDIR)/image-$$(DEVICE_DTS).dtb
+	KERNEL_NAME := Image
 endef
 
 define Device/FitImageLzma
-        KERNEL_SUFFIX := -uImage.itb
-        KERNEL = kernel-bin | lzma | fit lzma $$(KDIR)/image-$$(DEVICE_DTS).dtb
-        KERNEL_NAME := Image
+	KERNEL_SUFFIX := -uImage.itb
+	KERNEL = kernel-bin | lzma | fit lzma $$(KDIR)/image-$$(DEVICE_DTS).dtb
+	KERNEL_NAME := Image
 endef
 
 define Device/UbiFit
-        KERNEL_IN_UBI := 1
-        IMAGES := factory.ubi sysupgrade.bin
-        IMAGE/factory.ubi := append-ubi
-        IMAGE/sysupgrade.bin := sysupgrade-tar | append-metadata
+	KERNEL_IN_UBI = 1
+	ROOTFSNAME_IN_UBI = ubi2_rootfs
+	IMAGES := factory.ubi sysupgrade.bin
+	IMAGE/factory.ubi := append-ubi
+	IMAGE/sysupgrade.bin := sysupgrade-tar | append-metadata
 endef
 
 define Device/cig_wf186w
@@ -179,15 +180,19 @@ endef
 TARGET_DEVICES += optimcloud_d50-5g
  
 define Device/ikuai_sw8
-   DEVICE_TITLE := ikuai sw8
-   DEVICE_DTS := qcom-ipq5018-ikuai-sw8
-   SUPPORTED_DEVICES := ikuai,sw8
-   DEVICE_PACKAGES := ath11k-wifi-ikuai-sw8 ath11k-firmware-ipq50xx ath11k-firmware-qcn9000 
-   DEVICE_DTS_CONFIG := config@mp03.1
-   IMAGES := sysupgrade.bin nand-factory.bin nand-factory.ubi
-   IMAGE/sysupgrade.bin := sysupgrade-tar | append-metadata
-   IMAGE/nand-factory.bin := append-ubi | qsdk-ipq-factory-nand
-   IMAGE/nand-factory.ubi := append-ubi
+	$(call Device/Default)
+	$(call Device/FitImage)
+	$(call Device/UbiFit)
+	DEVICE_TITLE := ikuai sw8
+	DEVICE_DTS := qcom-ipq5018-ikuai-sw8
+	SUPPORTED_DEVICES := ikuai,sw8
+	DEVICE_PACKAGES := ath11k-wifi-ikuai-sw8 ath11k-firmware-ipq50xx ath11k-firmware-qcn9000 
+	DEVICE_DTS_CONFIG := config@mp03.1
+	ROOTFSNAME_IN_UBI := rootfs
+	IMAGES := sysupgrade.bin nand-factory.bin nand-factory.ubi
+	IMAGE/sysupgrade.bin := sysupgrade-tar | append-metadata
+	IMAGE/nand-factory.bin := append-ubi | qsdk-ipq-factory-nand
+	IMAGE/nand-factory.ubi := append-ubi
 endef
 TARGET_DEVICES += ikuai_sw8
 

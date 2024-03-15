@@ -9,8 +9,6 @@ define Device/Default
   KERNEL_NAME := zImage
   FILESYSTEMS := squashfs
   DEVICE_DTS_DIR := $(DTS_DIR)
-  KERNEL_IN_UBI := 1
-  ROOTFSNAME_IN_UBI := ubi_rootfs
   BLOCKSIZE := 128k
   PAGESIZE := 2048
   IMAGES := sysupgrade.tar nand-factory.bin

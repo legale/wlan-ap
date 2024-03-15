@@ -20,9 +20,6 @@
 	model = "ikuai sw8";
 	compatible = "ikuai,sw8", "qcom,ipq5018-mp03.1", "qcom,ipq5018";
 	interrupt-parent = <&intc>;
-	#ifdef __IPQ_MEM_PROFILE_256_MB__
-	AUTO_MOUNT;
-	#endif
 	aliases {
 		led-boot = &led_system;
 		led-failsafe = &led_system;
@@ -36,11 +33,7 @@
 	};
 	chosen {
 		bootargs = "console=ttyMSM0,115200,n8 rw init=/init";
-	#ifdef __IPQ_MEM_PROFILE_256_MB__
-		bootargs-append = " swiotlb=1";
-	#else
-		bootargs-append = " swiotlb=1 coherent_pool=2M";
-	#endif
+		bootargs-append = " root=/dev/ubiblock0_1 swiotlb=1 coherent_pool=2M";
 		stdout-path = "serial0";
 	};
 	reserved-memory {
