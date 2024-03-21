@@ -185,7 +185,7 @@ define Device/ikuai_sw8
 	$(call Device/UbiFit)
 	DEVICE_TITLE := ikuai sw8
 	DEVICE_DTS := qcom-ipq5018-ikuai-sw8
-	SUPPORTED_DEVICES := ikuai,sw8
+	SUPPORTED_DEVICES := ikuai,sw8 fplus,wf-ap-624m-iic
 	DEVICE_PACKAGES := ath11k-wifi-ikuai-sw8 ath11k-firmware-ipq50xx ath11k-firmware-qcn9000 
 	DEVICE_DTS_CONFIG := config@mp03.1
 	ROOTFSNAME_IN_UBI := rootfs
@@ -195,6 +195,23 @@ define Device/ikuai_sw8
 	IMAGE/nand-factory.ubi := append-ubi
 endef
 TARGET_DEVICES += ikuai_sw8
+
+define Device/fplus_wf-ap-624m-iic
+	$(call Device/Default)
+	$(call Device/FitImage)
+	$(call Device/UbiFit)
+	DEVICE_TITLE := fplus wf-ap-624m-iic
+	DEVICE_DTS := qcom-ipq5018-fplus-wf-ap-624m-iic
+	SUPPORTED_DEVICES := ikuai,sw8 fplus,wf-ap-624m-iic
+	DEVICE_PACKAGES := ath11k-wifi-ikuai-sw8 ath11k-firmware-ipq50xx ath11k-firmware-qcn9000 
+	DEVICE_DTS_CONFIG := config@mp03.1
+	ROOTFSNAME_IN_UBI := rootfs
+	IMAGES := sysupgrade.bin nand-factory.bin nand-factory.ubi
+	IMAGE/sysupgrade.bin := sysupgrade-tar | append-metadata
+	IMAGE/nand-factory.bin := append-ubi | qsdk-ipq-factory-nand
+	IMAGE/nand-factory.ubi := append-ubi
+endef
+TARGET_DEVICES += fplus_wf-ap-624m-iic
 
 define Device/optimcloud_d50
    DEVICE_TITLE := OptimCloud D50

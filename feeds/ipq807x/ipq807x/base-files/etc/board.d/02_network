@@ -109,7 +109,8 @@ qcom_setup_interfaces()
         ucidef_set_interface_wan "eth0"
         ucidef_set_interface_lan "eth1"
         ;;        
- 	ikuai,sw8)
+ 	ikuai,sw8|\
+	fplus,wf-ap-624m-iic)
 		ucidef_set_interface_lan "lan"
 		ucidef_set_interface_wan "wan"
 		#ucidef_add_switch "switch1"
@@ -241,7 +242,8 @@ qcom_setup_macs()
 		ucidef_set_network_device_mac eth1 $lan_mac
 		ucidef_set_label_macaddr $wan_mac
 		;;
-	ikuai,sw8)
+	ikuai,sw8|\
+	fplus,wf-ap-624m-iic)
 		wan_mac=$(cat /sys/class/net/wan/address)
 		lan_mac=$(cat /sys/class/net/lan/address)
 		;;

@@ -211,8 +211,9 @@ ath11k/IPQ5018/hw1.0/caldata.bin)
 	optimcloud,d60|\
  	optimcloud,d60-5g|\
  	optimcloud,d50|\
- 	optimcloud,d50-5g|\    
+ 	optimcloud,d50-5g|\ 
  	ikuai,sw8|\
+	fplus,wf-ap-624m-iic|\
 	qcom,ipq5018-mp03.1)
 		caldata_extract "0:ART" 0x1000 0x20000
 		;;
@@ -259,6 +260,7 @@ ath11k/QCN9074/hw1.0/caldata_1.bin)
  	optimcloud,d50|\
  	optimcloud,d50-5g|\
  	ikuai,sw8|\
+	fplus,wf-ap-624m-iic|\
 	qcom,ipq5018-mp03.1|\
 	qcom,ipq807x-hk14)
 		caldata_extract "0:ART" 0x26800 0x20000
@@ -301,7 +303,8 @@ ath11k-macs)
  	optimcloud,d60-5g|\
  	optimcloud,d50|\
  	optimcloud,d50-5g|\
- 	ikuai,sw8|\    
+ 	ikuai,sw8|\
+	fplus,wf-ap-624m-iic|\
 	cig,wf188n)
 		ath11k_generate_macs
 		;;
