@@ -1,8 +1,74 @@
 . /lib/functions/system.sh
 
-
 RAMFS_COPY_BIN='fw_setenv'
 RAMFS_COPY_DATA='/etc/fw_env.config /var/lock/fw_printenv.lock /tmp/downgrade'
+
+
+#redefine fixed find_mtd_index (show only first found line)
+find_mtd_index() {
+	local PART="$(grep -m 1 "\"$1\"" /proc/mtd | awk -F: '{print $1}')"
+	local INDEX="${PART##mtd}"
+	echo ${INDEX}
+}
+
+
+sw8_env_setup() {
+	local ubifile=$(board_name)
+	local active=$1
+	cat > /tmp/env_tmp << EOF
+owrt_slotactive=$active
+owrt_bootcount=0
+bootfile=${ubifile}.ubi
+owrt_bootcountcheck=if test \$owrt_bootcount > 4; then run owrt_tftprecover; fi; if test \$owrt_bootcount = 3; then run owrt_slotswap; else echo bootcountcheck successfull; fi
+owrt_bootinc=if test \$owrt_bootcount < 5; then echo save env part; setexpr owrt_bootcount \${owrt_bootcount} + 1 && saveenv; else echo save env skipped; fi; echo current bootcount: \$owrt_bootcount
+bootcmd=run owrt_bootinc && run owrt_bootcountcheck && run owrt_slotselect && run owrt_bootlinux
+owrt_bootlinux=echo booting linux... && ubi part fs && ubi read 0x44000000 kernel && bootm; reset
+owrt_setslot0=setenv bootargs console=ttyMSM0,115200n8 ubi.mtd=rootfs root=mtd:rootfs rootfstype=squashfs rootwait swiotlb=1 && setenv mtdparts mtdparts=nand0:0x3a00000@0x900000(fs)
+owrt_setslot1=setenv bootargs console=ttyMSM0,115200n8 ubi.mtd=rootfs_1 root=mtd:rootfs rootfstype=squashfs rootwait swiotlb=1 && setenv mtdparts mtdparts=nand0:0x3a00000@0x4300000(fs)
+owrt_slotswap=setexpr owrt_slotactive 1 - \${owrt_slotactive} && saveenv && echo slot swapped. new active slot: \$owrt_slotactive
+owrt_slotselect=setenv mtdids nand0=nand0; if test \$owrt_slotactive = 0; then run owrt_setslot0; else run owrt_setslot1; fi
+owrt_tftprecover=echo trying to recover firmware with tftp... && sleep 10 && dhcp && flash rootfs && flash rootfs_1 && setenv owrt_bootcount 0 && setenv owrt_slotactive 0 && saveenv && reset
+owrt_env_ver=3
+bootargs=""
+EOF
+	fw_setenv --script /tmp/env_tmp
+}
+
+sw8_upgrade() {
+	local ret val
+	CI_ROOTPART="rootfs"
+
+	#get active rootfs part offset	
+	active_part_name=$(cat /proc/cmdline | grep -o 'ubi.mtd=[^ ]*' | tail -1 | cut -d'=' -f2)
+	active_part_dev=$(cat /proc/mtd | grep \"${active_part_name}\" | grep 03a00000 -m 1 | cut -d":" -f 1)
+	active_part_offset=$(printf "0x%x\n" $(cat /sys/class/mtd/${active_part_dev}/offset))
+	local active=0
+	#select partition to install based on active partition offset
+	[ -z "$active_part_offset" ] && exit 1
+	if [ "$active_part_offset" != "0x900000" ]; then
+		active=1
+	fi
+
+	val=$(fw_printenv -n owrt_env_ver 2>/dev/null)
+	ret=$?
+	[ $ret != 0 ] && val=0
+	[ $val -lt 3 ] && sw8_env_setup $active
+	if [ "$active" = "1" ]; then
+		CI_UBIPART="rootfs"
+		CI_FWSETENV="owrt_slotactive 0"
+	else
+		CI_UBIPART="rootfs_1"
+		CI_FWSETENV="owrt_slotactive 1"
+	fi
+	fw_setenv owrt_bootcount 0
+	
+	# complete std upgrade
+	if nand_upgrade_tar "$1" ; then
+		nand_do_upgrade_success
+	else
+		nand_do_upgrade_failed
+	fi
+}
 
 qca_do_upgrade() {
 	local tar_file="$1"
@@ -167,6 +233,7 @@ platform_check_image() {
  	optimcloud,d50|\
  	optimcloud,d50-5g|\
  	ikuai,sw8|\
+	fplus,wf-ap-624m-iic|\
 	qcom,ipq5018-mp03.3)
 		[ "$magic_long" = "73797375" ] && return 0
 		;;
@@ -207,7 +274,6 @@ platform_do_upgrade() {
  	optimcloud,d60-5g|\
  	optimcloud,d50|\
  	optimcloud,d50-5g|\
- 	ikuai,sw8|\
 	qcom,ipq5018-mp03.3|\
 	wallys,dr5018|\
 	wallys,dr6018|\
@@ -246,6 +312,16 @@ platform_do_upgrade() {
 			CI_FWSETENV="primary 1"
 		fi
 		nand_upgrade_tar "$1"
+		;;
+ 	ikuai,sw8|\
+	fplus,wf-ap-624m-iic)
+		CI_ROOTPART="rootfs"	
+		if $(grep -q ubi.mtd=rootfs_1 /proc/cmdline); then
+			CI_UBIPART=rootfs 
+		else
+			CI_UBIPART=rootfs_1
+		fi
+		sw8_upgrade "$1"
 		;;
 	edgecore,eap104|\
 	liteon,wpx8324|\
