@@ -1,0 +1,240 @@
+From 72f0ea1afc98e876d991ff5d6f559f3c4dfd0dc5 Mon Sep 17 00:00:00 2001
+From: Isaev Ruslan <legale.legale@gmail.com>
+Date: Sun, 17 Mar 2024 01:37:02 +0300
+Subject: [PATCH 4/4] add deploy sh scripts
+
+Signed-off-by: Isaev Ruslan <legale.legale@gmail.com>
+---
+ deploy-ap.sh  | 190 ++++++++++++++++++++++++++++++++++++++++++++++++++
+ deploymake.sh |  11 +++
+ fw_setup      |   3 +
+ 3 files changed, 204 insertions(+)
+ create mode 100755 deploy-ap.sh
+ create mode 100755 deploymake.sh
+ create mode 100644 fw_setup
+
+diff --git a/deploy-ap.sh b/deploy-ap.sh
+new file mode 100755
+index 0000000000..489b7a9bf6
+--- /dev/null
++++ b/deploy-ap.sh
+@@ -0,0 +1,190 @@
++#!/bin/sh
++#set -x
++
++HOST=root@packages.wnam.ru
++URLPRE=http://packages.wnam.ru
++
++# Function to extract value from .config file
++extract_config_value() {
++    local config_file="$1"
++    local parameter="$2"
++    grep -o "$parameter=.*" "$config_file" | cut -d "=" -f 2 | sed 's/\"//g'
++}
++
++get_file_type() {
++    local filename="$1"
++
++    case "$filename" in
++        *sysupgrade*)
++            echo "sysupgrade"
++            ;;
++        *factory*)
++            echo "factory"
++            ;;
++        *initramfs*)
++            echo "initramfs"
++            ;;
++        *)
++            echo "unknown"
++            ;;
++    esac
++}
++
++# Function to calculate SHA256 hash of a file
++calculate_sha256() {
++    local file_path="$1"
++    local sha256_hash
++    sha256_hash=$(./staging_dir/host/bin/mkhash -N sha256 "$file_path")
++    local RET=$?
++	echo "$sha256_hash"
++	return $RET
++}
++
++# Function to create symbolic link or copy file with handling SHA256 hash
++handle_file() {
++    local src_file="$1"
++    local dst_pre="$2"
++    local dst_dirname="$3"
++    local dst_dir="${dst_pre}/${dst_dirname}"
++    local version="$4"
++    local model="$5"
++	local file_type="$6"
++
++    # Check if the source file exists
++    if [ ! -f "$src_file" ]; then
++        echo "File \"$src_file\" is not exists"
++        return 1
++    fi
++
++    local file_name
++    local file_ext
++	local file_name=$(basename -- "$src_file")
++	local file_ext=$(echo "$file_name" | grep -oE "\.[^.]+$")
++    
++	[ -z "$file_type" ] && file_type=$(get_file_type "$src_file")
++	
++	#echo $src_file
++	#echo $dst_pre
++	#echo $dst_dirname
++	#echo $file_name
++	#echo $file_ext
++	#echo $file_type 
++	#return 1
++	
++	#check and make target dir	
++	ssh "$HOST" "[ -d "$dst_dir" ] || (rm -f \"$dst_dir\"; mkdir -p \"$dst_dir\")"
++    
++	# Continue execution only if the file type is known
++    if [ "$file_type" = "unknown" ]; then
++        scp "$src_file" "$HOST:$dst_dir/$file_name"
++        return 0
++    else
++        # echo \# scp "$src_file" "$HOST:$dst_dir/${model}_${version}_${file_type}${file_ext}"
++        scp "$src_file" "$HOST:$dst_dir/${model}_${version}_${file_type}${file_ext}"
++    fi
++
++    local sha256
++    sha256=$(calculate_sha256 "$src_file")
++    if [ -z "$sha256" ]; then
++        echo "error: calculate SHA256 hash for: $src_file"
++        return 1
++    fi
++
++
++    # Save the SHA256 hash
++	local DST_FULL=$dst_dir/${model}_${version}_${file_type}${file_ext}
++    ssh "$HOST" "echo $sha256 > \"${DST_FULL}.sha256\""
++	
++	# print url
++    echo "$URLPRE/$URL_ROOT/$ARCH/$TARGET/$SUBTARGET/$PROFILE/$dst_dirname/${model}_${version}_${file_type}${file_ext}"
++}
++
++
++
++# Function to synchronize files via rsync
++sync_files() {
++    local src_dir="$1"
++    local dst_dir="$2"
++    rsync -ahL --delete "$src_dir"/* "$HOST:$dst_dir"
++}
++
++# Read configurations from .config file
++ARCH=$(extract_config_value .config 'CONFIG_ARCH')
++ARCH_PACKAGES=$(extract_config_value .config 'CONFIG_TARGET_ARCH_PACKAGES')
++TARGET=$(extract_config_value .config 'CONFIG_TARGET_BOARD')
++SUBTARGET=$(extract_config_value .config 'CONFIG_TARGET_SUBTARGET')
++PROFILE=$(extract_config_value .config 'CONFIG_TARGET_PROFILE' | sed 's/DEVICE_//g')
++MODEL=$(echo "$PROFILE" | cut -d '_' -f 2)
++VENDOR=$(echo "$PROFILE" | cut -d '_' -f 1)
++IPK=$(find bin/packages -path "*/$ARCH_PACKAGES/wda/wda_*.ipk" | head -n1)
++VERSION=$(basename -- "$IPK" | cut -d'_' -f2)
++VERSION_ABC=$(echo $VERSION | cut -d'-' -f 1 | head -1)
++FW_VER_FILE=$(find staging_dir -path "*/root-$TARGET/etc/fw_version" | head -n1)
++
++[ -z "$FW_VER_FILE" ] && echo error: fw_version file not found! && exit 1
++FW_VERSION=$(cat $FW_VER_FILE | head -1)
++
++
++URL_ROOT=ap/dev
++URL=$URLPRE/$URL_ROOT/$ARCH/$TARGET/$SUBTARGET/$PROFILE
++DST_ROOT=/var/www/packages/$URL_ROOT
++DST=$DST_ROOT/$ARCH/$TARGET/$SUBTARGET/$PROFILE
++
++echo "         HOST: $HOST"
++echo "         ARCH: $ARCH"
++echo "ARCH_PACKAGES: $ARCH_PACKAGES"
++echo "       TARGET: $TARGET"
++echo "    SUBTARGET: $SUBTARGET"
++echo "      PROFILE: $PROFILE"
++echo "       VENDOR: $VENDOR"
++echo "        MODEL: $MODEL"
++echo "      VERSION: $VERSION"
++echo "VERSION SHORT: $VERSION_ABC"
++echo "   FW VERSION: $FW_VERSION"
++echo "          DST: $DST"
++echo "          URL: $URL"
++
++deployrepo(){
++	# Make sure necessary directories exist on the server
++	ssh "$HOST" "mkdir -p $DST/packages"
++	ssh "$HOST" "mkdir -p $DST/packages/kmods"
++
++	# Sync kernel modules and packages
++	sync_files "./bin/packages/$ARCH_PACKAGES" "$DST/packages"
++	sync_files "./bin/targets/$TARGET/$SUBTARGET/packages" "$DST/packages/kmods"
++}
++
++deployfw(){
++	# Handle firmware files
++	FW_FILES=$(find ./bin/targets -path "${FW}*" | grep -E "$PROFILE(-initram|-squash|factory)")
++	for FILE in $FW_FILES; do
++		handle_file "$FILE" "$DST" "openwrt" "${FW_VERSION}_${VERSION}" "$MODEL"
++	done
++}
++
++deploywda(){
++	# Handle wda.ipk
++	handle_file "$IPK" "$DST" "wda" "$VERSION" "$MODEL" "wda"
++
++	# Handle wda bin
++	BIN=wda
++	FIND=*target-${ARCH}_${CONFIG_ARCH_PACKAGES}*${VERSION_ABC}*/bin/${BIN}
++	WDABIN=$(find ./build_dir -path "$FIND" | grep "$VERSION_ABC" | head -1)
++	handle_file "$WDABIN" "$DST" "wda" "$VERSION" "$MODEL" "wda"
++}
++
++if [ -z "$1" ] || [ "$1" = "all" ]; then
++	deployrepo
++	deployfw
++	deploywda
++elif [ "$1" = "fw" ]; then
++	deployfw
++elif [ "$1" = "repo" ]; then
++	deployrepo
++elif [ "$1" = "wda" ]; then
++	deploywda
++fi
++
++
++exit 0
++
+diff --git a/deploymake.sh b/deploymake.sh
+new file mode 100755
+index 0000000000..2e4bba0837
+--- /dev/null
++++ b/deploymake.sh
+@@ -0,0 +1,11 @@
++#!/bin/sh
++#set -x
++
++#if [ "$(id -un)" != "dev" ]; then 
++#    sudo su dev $0 $@
++#    exit 0
++#fi
++
++echo make -j$(nproc) $@ \&\& ./deploy-ap.sh
++
++make -j$(nproc) $@ && ./deploy-ap.sh
+diff --git a/fw_setup b/fw_setup
+new file mode 100644
+index 0000000000..09b5450d7e
+--- /dev/null
++++ b/fw_setup
+@@ -0,0 +1,3 @@
++FW_TYPE=b
++FW_VERSION_NUM_CMD=cd $(TOPDIR)/.. && git rev-list --count $$(git merge-base main HEAD)..HEAD
++
+-- 
+2.42.0
+

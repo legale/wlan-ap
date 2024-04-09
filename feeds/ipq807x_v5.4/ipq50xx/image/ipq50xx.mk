@@ -49,6 +49,20 @@ define Device/edgecore_eap104
 endef
 TARGET_DEVICES += edgecore_eap104
 
+define Device/noname_sw8-clone
+  DEVICE_TITLE := noname sw8-clone
+  DEVICE_DTS := qcom-ipq5018-sw8-clone
+  SUPPORTED_DEVICES := noname,sw8-clone
+  ROOTFSNAME_IN_UBI := rootfs
+  KERNEL_IN_UBI = 1
+  IMAGES := factory.ubi sysupgrade.bin
+  IMAGE/factory.ubi := append-ubi
+  IMAGE/sysupgrade.bin := sysupgrade-tar | append-metadata
+  DEVICE_PACKAGES := ath11k-wifi-noname-sw8-clone ath11k-firmware-ipq50xx ath11k-firmware-qcn6122
+  DEVICE_DTS_CONFIG := config@mp03.5-c1
+endef
+TARGET_DEVICES += noname_sw8-clone
+
 define Device/yuncore_fap655
   DEVICE_TITLE := Yuncore FAP650
   DEVICE_DTS := qcom-ipq5018-yuncore-fap655
