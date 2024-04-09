@@ -32,6 +32,7 @@ qcom_setup_interfaces()
 		ucidef_set_interface_lan "eth1"
 		ucidef_set_interface_wan "eth0"
 		;;
+	noname,sw8-clone|\
 	edgecore,eap104)
 		ucidef_set_interface_wan "eth0"
 		ucidef_add_switch "switch1" \
