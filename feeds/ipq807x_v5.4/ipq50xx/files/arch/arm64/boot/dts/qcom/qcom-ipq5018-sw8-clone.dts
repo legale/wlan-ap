@@ -299,6 +299,7 @@
 			local-mac-address = [000000000000];
 			phy-mode = "sgmii";
 			qcom,rx-page-mode = <0>;
+			label = "wan";
 		};
 
 		dp2 {
@@ -313,6 +314,7 @@
 			local-mac-address = [000000000000];
 			phy-mode = "sgmii";
 			qcom,rx-page-mode = <0>;
+			label = "lan";
 		};
 
 		nss-macsec1 {
