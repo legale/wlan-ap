@@ -31,6 +31,39 @@
 		stdout-path = "serial0";
 	};
 
+
+	keys {
+		compatible = "gpio-keys";
+
+		reset {
+			label = "reset";
+			gpios = <&tlmm 28 GPIO_ACTIVE_LOW>;
+			linux,code = <KEY_RESTART>;
+		};
+	};
+
+	leds {
+		compatible = "gpio-leds";
+
+		led_system: system {
+			color = <LED_COLOR_ID_RED>;
+			function = LED_FUNCTION_STATUS;
+			gpios = <&tlmm 32 GPIO_ACTIVE_HIGH>;
+		};
+
+		wlan2g {
+			color = <LED_COLOR_ID_GREEN>;
+			function = LED_FUNCTION_WLAN;
+			gpios = <&tlmm 37 GPIO_ACTIVE_HIGH>;
+		};
+
+		wlan5g {
+			color = <LED_COLOR_ID_BLUE>;
+			function = LED_FUNCTION_WLAN;
+			gpios = <&tlmm 35 GPIO_ACTIVE_HIGH>;
+		};
+	};
+
 	reserved-memory {
 		#address-cells = <0x02>;
 		#size-cells = <0x02>;
@@ -410,50 +443,6 @@
 		};
 	};
 
-	leds_pins: leds_pinmux {
-		led2_blue {
-			bias-pull-down;
-			drive-strength = <0x08>;
-			function = "gpio";
-			pins = "gpio19";
-		};
-
-		led2_green {
-			bias-pull-down;
-			drive-strength = <0x08>;
-			function = "gpio";
-			pins = "gpio38";
-		};
-
-		led2_red {
-			bias-pull-down;
-			drive-strength = <0x08>;
-			function = "gpio";
-			pins = "gpio17";
-		};
-
-		sysled_blue {
-			bias-pull-down;
-			drive-strength = <0x08>;
-			function = "gpio";
-			pins = "gpio33";
-		};
-
-		sysled_green {
-			bias-pull-down;
-			drive-strength = <0x08>;
-			function = "gpio";
-			pins = "gpio32";
-		};
-
-		sysled_red {
-			bias-pull-down;
-			drive-strength = <0x08>;
-			function = "gpio";
-			pins = "gpio31";
-		};
-	};
-
 	i2c_pins: i2c_pins {
 		i2c_scl {
 			pins = "gpio33";
@@ -465,15 +454,6 @@
 		i2c_sda {
 			pins = "gpio34";
 			function = "blsp2_i2c0";
-			drive-strength = <8>;
-			bias-pull-up;
-		};
-	};
-
-	button_pins: button_pins {
-		wps_button {
-			pins = "gpio38";
-			function = "gpio";
 			drive-strength = <8>;
 			bias-pull-up;
 		};
@@ -540,68 +520,6 @@
 			gpio-export,name = "mcu-enable";
 			gpio-export,output = <0>;
 			gpios = <&tlmm 31 GPIO_ACTIVE_HIGH>;
-		};
-	};
-
-	gpio_keys {
-		compatible = "gpio-keys";
-		pinctrl-0 = <&button_pins>;
-		pinctrl-names = "default";
-
-		reset {
-			label = "reset";
-			linux,code = <KEY_RESTART>;
-			gpios = <&tlmm 32 GPIO_ACTIVE_LOW>;
-			linux,input-type = <1>;
-			debounce-interval = <60>;
-		};
-	};
-
-	leds {
-		compatible = "gpio-leds";
-		pinctrl-0 = <&leds_pins>;
-		pinctrl-names = "default";
-		status = "ok";
-
-		led@17 {
-			default-state = "off";
-			gpios = <&tlmm 0x11 0x00>;
-			label = "led2_red";
-			color = "red";
-		};
-
-		led@19 {
-			default-state = "off";
-			gpios = <&tlmm 0x13 0x00>;
-			label = "led2_blue";
-			color = "blue";
-		};
-
-		led_system: led@31 {
-			default-state = "off";
-			gpios = <&tlmm 0x1f 0x00>;
-			label = "system";
-			color = "red";
-		};
-
-		led@32 {
-			default-state = "off";
-			gpios = <&tlmm 0x20 0x00>;
-			label = "wlan2g";
-			color = "green";
-		};
-
-		led@33 {
-			default-state = "off";
-			gpios = <&tlmm 0x21 0x00>;
-			label = "wlan5g";
-			color = "blue";
-		};
-
-		led@38 {
-			default-state = "off";
-			gpios = <&tlmm 0x26 0x00>;
-			label = "led2_green";
 		};
 	};
 };
