@@ -67,7 +67,7 @@ define Device/noname_sw8-clone
   IMAGES := factory.ubi sysupgrade.bin
   IMAGE/factory.ubi := append-ubi
   IMAGE/sysupgrade.bin := sysupgrade-tar | append-metadata
-  DEVICE_PACKAGES := ath11k-wifi-noname-sw8-clone ath11k-firmware-ipq50xx ath11k-firmware-qcn6122
+  DEVICE_PACKAGES := ath11k-wifi-noname-sw8-clone ath11k-firmware-ipq50xx-spruce ath11k-firmware-qcn6122
   DEVICE_DTS_CONFIG := config@mp03.5-c1
 endef
 TARGET_DEVICES += noname_sw8-clone
