@@ -648,41 +648,7 @@
 		qcom,smem-state-names = "shutdown",
 					"stop",
 					"spawn";
-	#ifdef __IPQ_MEM_PROFILE_256_MB__
-		memory-region = <&q6_qcn6122_data1>, <&m3_dump_qcn6122_1>,
-				<&q6_qcn6122_etr_1>;
-	#else
-		memory-region = <&q6_qcn6122_data1>, <&m3_dump_qcn6122_1>,
-				<&q6_qcn6122_etr_1>, <&q6_qcn6122_caldb_1>;
-	#endif
-
-	};
-
-	q6_wcss_pd3: remoteproc_pd3 {
-		compatible = "qcom,ipq5018-wcss-pcie-mpd";
-		firmware = "IPQ5018/q6_fw.mdt";
-		interrupts-extended = <&wcss_smp2p_in 24 0>,
-					<&wcss_smp2p_in 25 0>,
-					<&wcss_smp2p_in 28 0>,
-					<&wcss_smp2p_in 27 0>;
-		interrupt-names = "fatal",
-					"ready",
-					"spawn-ack",
-					"stop-ack";
-
-		qcom,smem-states = <&wcss_smp2p_out 24>,
-					<&wcss_smp2p_out 25>,
-					<&wcss_smp2p_out 26>;
-		qcom,smem-state-names = "shutdown",
-					"stop",
-					"spawn";
-	#ifdef	__IPQ_MEM_PROFILE_256_MB__
-		memory-region = <&q6_qcn6122_data2>, <&m3_dump_qcn6122_2>,
-				<&q6_qcn6122_etr_2>;
-	#else
-		memory-region = <&q6_qcn6122_data2>, <&m3_dump_qcn6122_2>,
-				<&q6_qcn6122_etr_2>, <&q6_qcn6122_caldb_2>;
-	#endif
+		memory-region = <&q6_qcn6122_data1>, <&m3_dump_qcn6122_1>, <&q6_qcn6122_etr_1>, <&q6_qcn6122_caldb_1>;
 	};
 };
 
@@ -711,17 +677,6 @@
 	qcom,board_id = <0x60>;
 	memory-region = <&q6_qcn6122_data1>;
 	status = "ok";
-};
-
-&wifi2 {
-	/* QCN6122 6G */
-	qcom,multipd_arch;
-	qcom,userpd-subsys-name = "q6v5_wcss_userpd3";
-	qcom,rproc = <&q6_wcss_pd3>;
-	qcom,tgt-mem-mode = <1>;
-	qcom,board_id = <0xb0>;
-	memory-region = <&q6_qcn6122_data2>;
-	status = "disabled";
 };
 
 &usb3 {
