@@ -1,0 +1,27 @@
+From 6d4cc4763ca7f21ac4d41dddeaabf43a1bbda1e3 Mon Sep 17 00:00:00 2001
+From: Isaev Ruslan <legale.legale@gmail.com>
+Date: Fri, 12 Apr 2024 02:24:26 +0300
+Subject: [PATCH] fix ipt-nat6 to avoid kernel compilation dialog about
+ CONFIG_IP6_NF_TARGET_MASQUERADE
+
+Signed-off-by: Isaev Ruslan <legale.legale@gmail.com>
+---
+ package/kernel/linux/modules/netfilter.mk | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/package/kernel/linux/modules/netfilter.mk b/package/kernel/linux/modules/netfilter.mk
+index 38a6dd316f..8e7e6a3f6d 100644
+--- a/package/kernel/linux/modules/netfilter.mk
++++ b/package/kernel/linux/modules/netfilter.mk
+@@ -540,7 +540,7 @@ $(eval $(call KernelPackage,ipt-raw6))
+ define KernelPackage/ipt-nat6
+   TITLE:=IPv6 NAT targets
+   DEPENDS:=@IPV6
+-  KCONFIG:=$(KCONFIG_IPT_NAT6)
++  KCONFIG:=$(KCONFIG_IPT_NAT6) CONFIG_IP6_NF_TARGET_MASQUERADE=m
+   FILES:=$(foreach mod,$(IPT_NAT6-m),$(LINUX_DIR)/net/$(mod).ko)
+   AUTOLOAD:=$(call AutoLoad,43,$(notdir $(IPT_NAT6-m)))
+   $(call AddDepends/ipt,+kmod-nf-nat6)
+-- 
+2.42.0
+
