@@ -1,6 +1,8 @@
 /dts-v1/;
 
 #include "ipq5018.dtsi"
+#include <dt-bindings/gpio/gpio.h>
+#include <dt-bindings/leds/common.h>
 #include <dt-bindings/input/input.h>
 
 / {
@@ -17,10 +19,10 @@
 		ethernet0 = "/soc/dp1";
 		ethernet1 = "/soc/dp2";
 
-		led-boot = &led_power;
-		led-failsafe = &led_power;
-		led-running = &led_power;
-		led-upgrade = &led_power;
+		led-boot = &led_system;
+		led-failsafe = &led_system;
+		led-running = &led_system;
+		led-upgrade = &led_system;
 	};
 
 	chosen {
@@ -408,42 +410,47 @@
 		};
 	};
 
-	leds_pins: leds_pins {
-		led_5g {
-			pins = "gpio2";
-			function = "gpio";
-			drive-strength = <8>;
+	leds_pins: leds_pinmux {
+		led2_blue {
 			bias-pull-down;
+			drive-strength = <0x08>;
+			function = "gpio";
+			pins = "gpio19";
 		};
-		led_2g {
-			pins = "gpio3";
-			function = "gpio";
-			drive-strength = <8>;
+
+		led2_green {
 			bias-pull-down;
+			drive-strength = <0x08>;
+			function = "gpio";
+			pins = "gpio38";
 		};
-		led_power {
-			pins = "gpio30";
-			function = "gpio";
-			drive-strength = <8>;
+
+		led2_red {
 			bias-pull-down;
+			drive-strength = <0x08>;
+			function = "gpio";
+			pins = "gpio17";
 		};
-		led_orange {
-			pins = "gpio42";
-			function = "gpio";
-			drive-strength = <8>;
+
+		sysled_blue {
 			bias-pull-down;
+			drive-strength = <0x08>;
+			function = "gpio";
+			pins = "gpio33";
 		};
-		led_yellow {
-			pins = "gpio43";
-			function = "gpio";
-			drive-strength = <8>;
+
+		sysled_green {
 			bias-pull-down;
+			drive-strength = <0x08>;
+			function = "gpio";
+			pins = "gpio32";
 		};
-		led_cloud {
-			pins = "gpio46";
-			function = "gpio";
-			drive-strength = <8>;
+
+		sysled_red {
 			bias-pull-down;
+			drive-strength = <0x08>;
+			function = "gpio";
+			pins = "gpio31";
 		};
 	};
 
@@ -471,6 +478,51 @@
 			bias-pull-up;
 		};
 	};
+
+	audio_pins: audio_pinmux {
+		mux_1 {
+			pins = "gpio24";
+			function = "audio_rxbclk";
+			drive-strength = <8>;
+			bias-pull-down;
+		};
+		mux_2 {
+			pins = "gpio25";
+			function = "audio_rxfsync";
+			drive-strength = <8>;
+			bias-pull-down;
+		};
+		mux_3 {
+			pins = "gpio26";
+			function = "audio_rxd";
+			drive-strength = <8>;
+			bias-pull-down;
+		};
+		mux_4 {
+			pins = "gpio27";
+			function = "audio_txmclk";
+			drive-strength = <8>;
+			bias-pull-down;
+		};
+		mux_5 {
+			pins = "gpio28";
+			function = "audio_txbclk";
+			drive-strength = <8>;
+			bias-pull-down;
+		};
+		mux_6 {
+			pins = "gpio29";
+			function = "audio_txfsync";
+			drive-strength = <8>;
+			bias-pull-down;
+		};
+		mux_7 {
+			pins = "gpio30";
+			function = "audio_txd";
+			drive-strength = <8>;
+			bias-pull-down;
+		};
+	};
 };
 
 &soc {
@@ -496,7 +548,7 @@
 		pinctrl-0 = <&button_pins>;
 		pinctrl-names = "default";
 
-		wps {
+		reset {
 			label = "reset";
 			linux,code = <KEY_RESTART>;
 			gpios = <&tlmm 32 GPIO_ACTIVE_LOW>;
@@ -509,36 +561,47 @@
 		compatible = "gpio-leds";
 		pinctrl-0 = <&leds_pins>;
 		pinctrl-names = "default";
+		status = "ok";
 
-		led@2 {
-			label = "green:wifi5";
-			gpios = <&tlmm 2 GPIO_ACTIVE_HIGH>;
+		led@17 {
 			default-state = "off";
+			gpios = <&tlmm 0x11 0x00>;
+			label = "led2_red";
+			color = "red";
 		};
-		led@3 {
-			label = "green:wifi2";
-			gpios = <&tlmm 3 GPIO_ACTIVE_HIGH>;
+
+		led@19 {
 			default-state = "off";
+			gpios = <&tlmm 0x13 0x00>;
+			label = "led2_blue";
+			color = "blue";
 		};
-		led_power: led@30 {
-			label = "green:power";
-			gpios = <&tlmm 30 GPIO_ACTIVE_HIGH>;
-			default-state = "on";
-		};
-		led@42 {
-			label = "orange:uplink";
-			gpios = <&tlmm 42 GPIO_ACTIVE_HIGH>;
+
+		led_system: led@31 {
 			default-state = "off";
+			gpios = <&tlmm 0x1f 0x00>;
+			label = "system";
+			color = "red";
 		};
-		led@43 {
-			label = "yellow:uplink";
-			gpios = <&tlmm 43 GPIO_ACTIVE_HIGH>;
+
+		led@32 {
 			default-state = "off";
+			gpios = <&tlmm 0x20 0x00>;
+			label = "wlan2g";
+			color = "green";
 		};
-		led@46 {
-			label = "green:cloud";
-			gpios = <&tlmm 46 GPIO_ACTIVE_HIGH>;
+
+		led@33 {
 			default-state = "off";
+			gpios = <&tlmm 0x21 0x00>;
+			label = "wlan5g";
+			color = "blue";
+		};
+
+		led@38 {
+			default-state = "off";
+			gpios = <&tlmm 0x26 0x00>;
+			label = "led2_green";
 		};
 	};
 };
