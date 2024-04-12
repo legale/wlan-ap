@@ -69,19 +69,19 @@
 			reg = <0x00 0x4b000000 0x00 0x60000>;
 		};
 
-		q6_etr_region: q6_etr_dump@4D200000 {
+		q6_etr_region: q6_etr_dump@4D300000 {
 			no-map;
-			reg = <0x00 0x4d200000 0x00 0x100000>;
+			reg = <0x00 0x4d300000 0x00 0x100000>;
 		};
 
 		q6_ipq5018_data: q6_ipq5018_data@4C400000 {
 			no-map;
-			reg = <0x00 0x4c400000 0x00 0xd00000>;
+			reg = <0x00 0x4c400000 0x00 0xe00000>;
 		};
 
 		q6_mem_regions: q6_mem_regions@4B000000 {
 			no-map;
-			reg = <0x00 0x4b000000 0x00 0x3400000>;
+			reg = <0x00 0x4b000000 0x00 0x5400000>;
 		};
 
 		q6_qcn6122_caldb_1: q6_qcn6122_caldb_1@4E800000 {
@@ -119,7 +119,7 @@
 			reg = <0x00 0x4aa00000 0x00 0x100000>;
 		};
 
-		smem@4ab00000 {
+		smem_region: smem@4ab00000 {
 			no-map;
 			reg = <0x00 0x4ab00000 0x00 0x100000>;
 		};
@@ -129,12 +129,7 @@
 			reg = <0x00 0x4ac00000 0x00 0x400000>;
 		};
 
-		tzapp@4a400000 {
-			no-map;
-		};
-
-		tzapp_data@4a700000 {
-			compatible = "shared-dma-pool";
+		tzapp: tzapp@4a400000 {
 			no-map;
 		};
 
