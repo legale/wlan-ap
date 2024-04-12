@@ -34,7 +34,7 @@
 		#size-cells = <0x02>;
 		ranges;
 
-		bt@7000000 {
+		bt_region: bt@7000000 {
 			no-map;
 			reg = <0x00 0x7000000 0x00 0x58000>;
 		};
@@ -85,9 +85,7 @@
 		};
 
 		q6_qcn6122_caldb_1: q6_qcn6122_caldb_1@4E800000 {
-			linux,phandle = <0x1c>;
 			no-map;
-			phandle = <0x1c>;
 			reg = <0x00 0x4e800000 0x00 0x500000>;
 		};
 
@@ -97,9 +95,7 @@
 		};
 
 		q6_qcn6122_data1: q6_qcn6122_data1@4D600000 {
-			linux,phandle = <0x19>;
 			no-map;
-			phandle = <0x19>;
 			reg = <0x00 0x4d600000 0x00 0x1000000>;
 		};
 
@@ -109,9 +105,7 @@
 		};
 
 		q6_qcn6122_etr_1: q6_qcn6122_etr_1@4E700000 {
-			linux,phandle = <0x1b>;
 			no-map;
-			phandle = <0x1b>;
 			reg = <0x00 0x4e700000 0x00 0x100000>;
 		};
 
