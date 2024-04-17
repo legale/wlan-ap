@@ -1,0 +1,40 @@
+From e09bb16bdb57a31bfa1bc5fc91fd48315182afba Mon Sep 17 00:00:00 2001
+From: Isaev Ruslan <legale.legale@gmail.com>
+Date: Wed, 17 Apr 2024 09:29:25 +0300
+Subject: [PATCH] base-files: fix find_mtd_index return only first found
+
+Signed-off-by: Isaev Ruslan <legale.legale@gmail.com>
+---
+ package/base-files/files/lib/functions.sh   | 2 +-
+ package/base-files/files/lib/upgrade/stage2 | 2 +-
+ 2 files changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/package/base-files/files/lib/functions.sh b/package/base-files/files/lib/functions.sh
+index 87e2edee7a..6163fdd875 100644
+--- a/package/base-files/files/lib/functions.sh
++++ b/package/base-files/files/lib/functions.sh
+@@ -329,7 +329,7 @@ include() {
+ }
+ 
+ find_mtd_index() {
+-	local PART="$(grep "\"$1\"" /proc/mtd | awk -F: '{print $1}')"
++	local PART="$(grep "\"$1\"" /proc/mtd | awk -F: '{print $1}' | head -1)"
+ 	local INDEX="${PART##mtd}"
+ 
+ 	echo ${INDEX}
+diff --git a/package/base-files/files/lib/upgrade/stage2 b/package/base-files/files/lib/upgrade/stage2
+index 5ce0b3549c..89f2cb1f73 100755
+--- a/package/base-files/files/lib/upgrade/stage2
++++ b/package/base-files/files/lib/upgrade/stage2
+@@ -37,7 +37,7 @@ switch_to_ramfs() {
+ 	RAMFS_COPY_LVM="$(command -v lvm)"
+ 
+ 	for binary in \
+-		/bin/busybox /bin/ash /bin/sh /bin/mount /bin/umount	\
++		head /bin/busybox /bin/ash /bin/sh /bin/mount /bin/umount	\
+ 		pivot_root mount_root reboot sync kill sleep		\
+ 		md5sum hexdump cat zcat dd tar gzip			\
+ 		ls basename find cp mv rm mkdir rmdir mknod touch chmod \
+-- 
+2.42.0
+
