@@ -3,6 +3,28 @@
 RAMFS_COPY_BIN='fw_printenv fw_setenv'
 RAMFS_COPY_DATA='/etc/fw_env.config /var/lock/fw_printenv.lock'
 
+ax840_env_setup() {
+	local ubifile=$(board_name)
+	local active=$(fw_printenv -n owrt_slotactive)
+	[ -z "$active" ] && active=$(hexdump -s 0x94 -n 4 -e '4 "%d"' /dev/mtd$(find_mtd_index 0:bootconfig))
+	cat > /tmp/env_tmp << EOF
+owrt_slotactive=${active}
+owrt_bootcount=0
+bootfile=${ubifile}.ubi
+owrt_bootcountcheck=if test \$owrt_bootcount > 4; then run owrt_tftprecover; fi; if test \$owrt_bootcount = 3; then run owrt_slotswap; else echo bootcountcheck successfull; fi
+owrt_bootinc=if test \$owrt_bootcount < 5; then echo save env part; setexpr owrt_bootcount \${owrt_bootcount} + 1 && saveenv; else echo save env skipped; fi; echo current bootcount: \$owrt_bootcount
+bootcmd=run owrt_bootinc && run owrt_bootcountcheck && run owrt_slotselect && run owrt_bootlinux
+owrt_bootlinux=echo booting linux... && ubi part fs && ubi read 0x44000000 kernel && bootm; reset
+owrt_setslot0=setenv bootargs console=ttyMSM0,115200n8 ubi.mtd=rootfs rootfstype=squashfs && setenv mtdparts mtdparts=nand0:0x3c00000@0(fs)
+owrt_setslot1=setenv bootargs console=ttyMSM0,115200n8 ubi.mtd=rootfs_1 rootfstype=squashfs && setenv mtdparts mtdparts=nand0:0x3c00000@0x3c00000(fs)
+owrt_slotswap=setexpr owrt_slotactive 1 - \${owrt_slotactive} && saveenv && echo slot swapped. new active slot: \$owrt_slotactive
+owrt_slotselect=setenv mtdids nand0=nand0,nand1=spi0.0; if test \$owrt_slotactive = 0; then run owrt_setslot0; else run owrt_setslot1; fi
+owrt_tftprecover=echo trying to recover firmware with tftp... && sleep 10 && dhcp && flash rootfs && flash rootfs_1 && setenv owrt_bootcount 0 && setenv owrt_slotactive 0 && saveenv && reset
+owrt_env_ver=9
+EOF
+	fw_setenv --script /tmp/env_tmp
+}
+
 qca_do_upgrade() {
         local tar_file="$1"
 
@@ -89,7 +111,7 @@ platform_check_image() {
 
 platform_do_upgrade() {
 	CI_UBIPART="rootfs"
-	CI_ROOTPART="ubi_rootfs"
+	CI_ROOTPART="rootfs"
 	CI_IPQ807X=1
 
 	board=$(board_name)
@@ -101,7 +123,18 @@ platform_do_upgrade() {
 	wallys,dr6018-v4|\
 	yuncore,ax840|\
 	yuncore,fap650)
-		nand_upgrade_tar "$1"
+		[ "$(fw_printenv -n owrt_env_ver 2>/dev/null)" -lt 8 ] && ax840_env_setup
+		local active="$(fw_printenv -n owrt_slotactive 2>/dev/null)"
+		CI_ROOTPART="rootfs"
+		if [ "$active" = "1" ]; then
+			CI_UBIPART="rootfs"
+			CI_FWSETENV="owrt_slotactive 0"
+		else
+			CI_UBIPART="rootfs_1"
+			CI_FWSETENV="owrt_slotactive 1"
+		fi
+		fw_setenv owrt_bootcount 0
+		nand_do_upgrade "$1"
 		;;
 	hfcl,ion4xi|\
 	hfcl,ion4x|\
