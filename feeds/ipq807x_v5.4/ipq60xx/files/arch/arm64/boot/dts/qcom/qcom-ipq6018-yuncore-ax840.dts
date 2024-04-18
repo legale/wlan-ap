@@ -28,12 +28,9 @@
 	qcom,msm-id = <0x1A5 0x0>;
 
 	aliases {
-		/*
-		 * Aliases as required by u-boot
-		 * to patch MAC addresses
-		 */
-		ethernet0 = "/soc/dp2";
-		ethernet1 = "/soc/dp1";
+		ethernet0 = &dp5;
+		ethernet1 = &dp4;
+		serial0 = &blsp1_uart3;
 		led-boot = &led_system;
 		led-failsafe = &led_system;
 		led-running = &led_system;
@@ -41,48 +38,41 @@
 	};
 
 	chosen {
-		bootargs = "console=ttyMSM0,115200,n8 rw init=/init";
-#ifdef __IPQ_MEM_PROFILE_256_MB__
-		bootargs-append = " swiotlb=1";
-#else
-		bootargs-append = " swiotlb=1 coherent_pool=2M";
-#endif
+		stdout-path = "serial0:115200n8";
+		bootargs-append = " root=/dev/ubiblock0_1 earlycon debug iomem=relaxed";
 	};
 
-	/*
-	 * +=========+==============+========================+
-	 * |        |              |                         |
-	 * | Region | Start Offset |          Size           |
-	 * |        |              |                         |
-	 * +--------+--------------+-------------------------+
-	 * |        |              |                         |
-	 * |        |              |                         |
-	 * |        |              |                         |
-	 * |        |              |                         |
-	 * | Linux  |  0x41000000  |         139MB           |
-	 * |        |              |                         |
-	 * |        |              |                         |
-	 * |        |              |                         |
-	 * +--------+--------------+-------------------------+
-	 * | TZ App |  0x49B00000  |           6MB           |
-	 * +--------+--------------+-------------------------+
-	 *
-	 * From the available 145 MB for Linux in the first 256 MB,
-	 * we are reserving 6 MB for TZAPP.
-	 *
-	 * Refer arch/arm64/boot/dts/qcom/qcom-ipq6018-memory.dtsi
-	 * for memory layout.
-	 */
+	keys {
+		compatible = "gpio-keys";
 
-/* TZAPP is enabled only in default memory profile */
-#if !defined(__IPQ_MEM_PROFILE_256_MB__) && !defined(__IPQ_MEM_PROFILE_512_MB__)
-	reserved-memory {
-		tzapp:tzapp@49B00000 {	/* TZAPPS */
-			no-map;
-			reg = <0x0 0x49B00000 0x0 0x00600000>;
+		reset {
+			label = "reset";
+			gpios = <&tlmm 19 GPIO_ACTIVE_LOW>;
+			linux,code = <KEY_RESTART>;
 		};
 	};
-#endif
+
+	leds {
+		compatible = "gpio-leds";
+
+		led_system: led_system {
+			label = "system";
+			color = "red";
+			gpios = <&tlmm 32 GPIO_ACTIVE_HIGH>;
+		};
+
+		led_wlan2g {
+			label = "wlan2g";
+			color = "green";
+			gpios = <&tlmm 37 GPIO_ACTIVE_HIGH>;
+		};
+
+		led_wlan5g {
+			label = "wlan5g";
+			color = "blue";
+			gpios = <&tlmm 35 GPIO_ACTIVE_HIGH>;
+		};
+	};
 };
 
 &tlmm {
@@ -201,8 +191,11 @@
 			};
 		};
 	};
+	
+	/delete-node/ dp1;
+	/delete-node/ dp2;
 
-	dp1 {
+	dp4: dp4 {
 		device_type = "network";
 		compatible = "qcom,nss-dp";
 		qcom,id = <0x04>;
@@ -212,9 +205,11 @@
 		qcom,link-poll = <0x01>;
 		qcom,phy-mdio-addr = <0x03>;
 		phy-mode = "sgmii";
+		label = "lan";
+		status = "ok";
 	};
 
-	dp2 {
+	dp5: dp5 {
 		device_type = "network";
 		compatible = "qcom,nss-dp";
 		qcom,id = <0x05>;
@@ -224,42 +219,8 @@
 		qcom,link-poll = <0x01>;
 		qcom,phy-mdio-addr = <0x04>;
 		phy-mode = "sgmii";
-	};
-
-	gpio_keys {
-		compatible = "gpio-keys";
-
-		pinctrl-0 = <&button_pins>;
-		pinctrl-names = "default";
-
-		reset {
-			label = "reset";
-			linux,code = <KEY_RESTART>;
-			gpios = <&tlmm 19 GPIO_ACTIVE_LOW>;
-			linux,input-type = <1>;
-			debounce-interval = <60>;
-		};
-	};
-
-	leds {
-		compatible = "gpio-leds";
-		pinctrl-0 = <&leds_pins>;
-		pinctrl-names = "default";
-
-		led_system: system {
-			label = "ax860:green:system";
-			gpio = <&tlmm 37 GPIO_ACTIVE_HIGH>;
-		};
-
-		wlan2g {
-			label = "ax860:blue:wlan2g";
-			gpio = <&tlmm 35 GPIO_ACTIVE_HIGH>;
-		};
-
-		wlan5g {
-			label = "ax860:red:wlan5g";
-			gpio = <&tlmm 32 GPIO_ACTIVE_HIGH>;
-		};
+		label = "wan";
+		status = "ok";
 	};
 };
 
@@ -270,19 +231,104 @@
 };
 
 &spi_0 {
-	pinctrl-0 = <&spi_0_pins>;
-	pinctrl-names = "default";
-	cs-select = <0>;
-	status = "ok";
+	status = "okay";
+	
+	partitions {
+		status = "disabled";
+	};
 
-	m25p80@0 {
+	flash@0 {
 		#address-cells = <1>;
 		#size-cells = <1>;
 		reg = <0>;
-		compatible = "n25q128a11";
-		linux,modalias = "m25p80", "n25q128a11";
+		compatible = "jedec,spi-nor";
 		spi-max-frequency = <50000000>;
-		use-default-sizes;
+
+		partitions {
+			compatible = "fixed-partitions";
+
+
+			partition@0 {
+				reg = <0x00 0xc0000>;
+				label = "0:sbl1";
+			};
+
+			partition@c0000 {
+				reg = <0xc0000 0x10000>;
+				label = "0:mibib";
+			};
+
+			partition@d0000 {
+				reg = <0xd0000 0x20000>;
+				label = "0:bootconfig";
+			};
+
+			partition@f0000 {
+				reg = <0xf0000 0x20000>;
+				label = "0:bootconfig1";
+			};
+
+			partition@110000 {
+				reg = <0x110000 0x1a0000>;
+				label = "0:qsee";
+			};
+
+			partition@2b0000 {
+				reg = <0x2b0000 0x1a0000>;
+				label = "0:qsee_1";
+			};
+
+			partition@450000 {
+				reg = <0x450000 0x10000>;
+				label = "0:devcfg";
+			};
+
+			partition@460000 {
+				reg = <0x460000 0x10000>;
+				label = "0:devcfg_1";
+			};
+
+			partition@470000 {
+				reg = <0x470000 0x40000>;
+				label = "0:rpm";
+			};
+
+			partition@4b0000 {
+				reg = <0x4b0000 0x40000>;
+				label = "0:rpm_1";
+			};
+
+			partition@4f0000 {
+				reg = <0x4f0000 0x10000>;
+				label = "0:cdt";
+			};
+
+			partition@500000 {
+				reg = <0x500000 0x10000>;
+				label = "0:cdt_1";
+			};
+
+			partition@510000 {
+				reg = <0x510000 0x10000>;
+				label = "0:appsblenv";
+			};
+
+			partition@520000 {
+				reg = <0x520000 0xa0000>;
+				label = "0:appsbl";
+			};
+
+			partition@5c0000 {
+				reg = <0x5c0000 0xa0000>;
+				label = "0:appsbl_1";
+			};
+
+			partition@660000 {
+				reg = <0x660000 0x40000>;
+				label = "0:art";
+			};
+
+		};
 	};
 };
 
@@ -291,16 +337,33 @@
 };
 
 &qpic_nand {
-	status = "ok";
+	status = "okay";
+	partitions {
+		status = "disabled";
+	};
 
 	nand@0 {
 		reg = <0>;
-		#address-cells = <1>;
-		#size-cells = <1>;
 
 		nand-ecc-strength = <4>;
 		nand-ecc-step-size = <512>;
 		nand-bus-width = <8>;
+	
+
+		partitions {
+			compatible = "fixed-partitions";
+			#address-cells = <1>;
+			#size-cells = <1>;
+
+			partition@0 {
+				label = "rootfs";
+				reg = <0x0 0x3c00000>;
+			};
+			partition@3c00000 {
+				label = "rootfs_1";
+				reg = <0x3c00000 0x3c00000>;
+			};
+		};
 	};
 };
 

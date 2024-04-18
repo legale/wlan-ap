@@ -20,8 +20,8 @@ qcom_setup_interfaces()
 		ucidef_set_interface_lan ""
 		;;
 	yuncore,ax840)
-		ucidef_set_interface_lan "eth0"
-		ucidef_set_interface_wan "eth1"
+		ucidef_set_interface_lan "lan"
+		ucidef_set_interface_wan "wan"
 		;;
 	edgecore,eap101|\
 	glinet,axt1800)
