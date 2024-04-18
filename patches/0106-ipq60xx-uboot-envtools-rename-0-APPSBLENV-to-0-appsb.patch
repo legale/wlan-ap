@@ -1,0 +1,35 @@
+From 1519b4428bab880e9e8f240c33c843e5dab689fa Mon Sep 17 00:00:00 2001
+From: Isaev Ruslan <legale.legale@gmail.com>
+Date: Tue, 16 Apr 2024 09:33:17 +0300
+Subject: [PATCH] ipq60xx: uboot-envtools: rename 0:APPSBLENV to 0:appsblenv
+
+Signed-off-by: Isaev Ruslan <legale.legale@gmail.com>
+---
+ package/boot/uboot-envtools/files/ipq60xx | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/package/boot/uboot-envtools/files/ipq60xx b/package/boot/uboot-envtools/files/ipq60xx
+index 8863df4225..4b2d4aef95 100644
+--- a/package/boot/uboot-envtools/files/ipq60xx
++++ b/package/boot/uboot-envtools/files/ipq60xx
+@@ -8,7 +8,7 @@ touch /etc/config/ubootenv
+ board=$(board_name)
+ 
+ ubootenv_mtdinfo () {
+-	UBOOTENV_PART=$(cat /proc/mtd | grep APPSBLENV)
++	UBOOTENV_PART=$(cat /proc/mtd | grep -i APPSBLENV)
+ 	mtd_dev=$(echo $UBOOTENV_PART | awk '{print $1}' | sed 's/:$//')
+ 	mtd_size=$(echo $UBOOTENV_PART | awk '{print "0x"$2}')
+ 	mtd_erase=$(echo $UBOOTENV_PART | awk '{print "0x"$3}')
+@@ -16,7 +16,7 @@ ubootenv_mtdinfo () {
+     	found_emmc=0
+     
+          if [ -z "$UBOOTENV_PART" ]; then
+-                mtd_dev=$(echo $(find_mmc_part "0:APPSBLENV") | sed 's/^.\{5\}//')
++                mtd_dev=$(echo $(find_mmc_part "0:appsblenv") | sed 's/^.\{5\}//')
+                 if [ -n "$mtd_dev" ]; then
+                         EMMC_UBOOTENV_PART=$(cat /proc/partitions | grep $mtd_dev)
+                         #convert block to bytes
+-- 
+2.42.0
+

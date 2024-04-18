@@ -9,7 +9,7 @@ define Device/Default
   FILESYSTEMS := squashfs
   DEVICE_DTS_DIR := $(DTS_DIR)/qcom
   KERNEL_IN_UBI := 1
-  ROOTFSNAME_IN_UBI := ubi_rootfs
+  ROOTFSNAME_IN_UBI := rootfs
   BLOCKSIZE := 128k
   PAGESIZE := 2048
   IMAGES := sysupgrade.tar nand-factory.bin
