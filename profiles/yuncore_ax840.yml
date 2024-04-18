@@ -7,6 +7,8 @@ image: bin/targets/ipq60xx/generic/openwrt-ipq60xx-yuncore_ax840-squashfs-sysupg
 feeds:
   - name: ipq807x
     path: ../../feeds/ipq807x_v5.4
+  - name: wda
+    path: /sdk1/wda_stable/openwrt
 include:
   - ucentral-ap
 packages:

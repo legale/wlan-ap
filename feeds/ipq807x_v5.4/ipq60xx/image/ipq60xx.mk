@@ -125,6 +125,11 @@ define Device/yuncore_ax840
   DEVICE_DTS_CONFIG := config@cp03-c1
   SUPPORTED_DEVICES := yuncore,ax840
   DEVICE_PACKAGES := ath11k-wifi-yuncore-ax840 uboot-env
+  ROOTFSNAME_IN_UBI := rootfs
+  KERNEL_IN_UBI = 1
+  IMAGES := factory.ubi sysupgrade.bin
+  IMAGE/factory.ubi := append-ubi
+  IMAGE/sysupgrade.bin := sysupgrade-tar | append-metadata
 endef
 TARGET_DEVICES += yuncore_ax840
 

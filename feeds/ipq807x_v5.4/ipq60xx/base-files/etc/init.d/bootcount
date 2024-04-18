@@ -11,11 +11,13 @@ boot() {
 	edgecore,eap101|\
 	edgecore,eap102|\
 	edgecore,oap102|\
-	noname,sw8-clone|\
 	edgecore,eap104)
 		avail=$(fw_printenv -n upgrade_available)
 		[ ${avail} -eq 0 ] && fw_setenv upgrade_available 1
 		fw_setenv bootcount 0
+		;;
+	yuncore,ax840)
+		fw_setenv owrt_bootcount 0
 		;;
 	esac
 }
