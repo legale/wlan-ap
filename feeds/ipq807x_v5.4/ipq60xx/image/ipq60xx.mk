@@ -123,7 +123,7 @@ define Device/yuncore_ax840
   DEVICE_TITLE := YunCore AX840
   DEVICE_DTS := qcom-ipq6018-yuncore-ax840
   DEVICE_DTS_CONFIG := config@cp03-c1
-  SUPPORTED_DEVICES := yuncore,ax840
+  SUPPORTED_DEVICES += yuncore,ax840-p2
   DEVICE_PACKAGES := ath11k-wifi-yuncore-ax840 uboot-env
   ROOTFSNAME_IN_UBI := rootfs
   KERNEL_IN_UBI = 1
