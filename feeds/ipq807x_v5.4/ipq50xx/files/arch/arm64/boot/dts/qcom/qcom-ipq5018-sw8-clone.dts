@@ -217,7 +217,124 @@
 			compatible = "n25q128a11";
 			linux,modalias = "m25p80", "n25q128a11";
 			spi-max-frequency = <50000000>;
-			use-default-sizes;
+
+			partitions {
+				compatible = "fixed-partitions";
+				#address-cells = <1>;
+				#size-cells = <1>;
+
+				partition@0 {
+					label = "0:sbl1";
+					reg = <0x0 0x80000>;
+					read-only;
+				};
+
+				partition@1 {
+					label = "0:mibib";
+					reg = <0x80000 0x10000>;
+					read-only;
+				};
+
+				partition@2 {
+					label = "0:bootconfig";
+					reg = <0x100000 0x140000>;
+					read-only;
+				};
+
+				partition@3 {
+					label = "0:bootconfig1";
+					reg = <0x140000 0x180000>;
+					read-only;
+				};
+
+				partition@4 {
+					label = "0:qsee";
+					reg = <0x180000 0x280000>;
+					read-only;
+				};
+
+				partition@5 {
+					label = "0:qsee_1";
+					reg = <0x280000 0x380000>;
+					read-only;
+				};
+
+				partition@6 {
+					label = "0:devcfg";
+					reg = <0x380000 0x3c0000>;
+					read-only;
+				};
+
+				partition@7 {
+					label = "0:devcfg_1";
+					reg = <0x3c0000 0x400000>;
+					read-only;
+				};
+
+				partition@8 {
+					label = "0:cdt";
+					reg = <0x400000 0x440000>;
+					read-only;
+				};
+
+				partition@9 {
+					label = "0:cdt_1";
+					reg = <0x440000 0x480000>;
+					read-only;
+				};
+
+				partition@10 {
+					label = "0:appsblenv";
+					reg = <0x480000 0x500000>;
+				};
+
+				partition@11 {
+					label = "0:appsbl";
+					reg = <0x500000 0x640000>;
+					read-only;
+				};
+
+				partition@12 {
+					label = "0:appsbl_1";
+					reg = <0x640000 0x780000>;
+					read-only;
+				};
+
+				partition@13 {
+					label = "0:art";
+					reg = <0x780000 0x880000>;
+					read-only;
+				};
+
+				partition@14 {
+					label = "0:training";
+					reg = <0x880000 0x90000>;
+					read-only;
+				};
+
+				partition@15 {
+					label = "rootfs";
+					reg = <0x900000 0x4300000>;
+				};
+				
+				partition@16 {
+					label = "rootfs_1";
+					reg = <0x4300000 0x7d00000>;
+				};
+
+				partition@17 {
+					label = "0:test";
+					reg = <0x7d00000 0x7d80000>;
+					read-only;
+
+				};
+
+				partition@18 {
+					label = "reset";
+					reg = <0x7d80000 0x7e00000>;
+					read-only;
+				};
+			};
 		};
 	};
 
