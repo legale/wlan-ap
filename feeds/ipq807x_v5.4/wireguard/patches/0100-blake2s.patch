@@ -1,0 +1,28 @@
+Index: wireguard-linux-compat-1.0.20220627/src/crypto/zinc/blake2s/blake2s.c
+===================================================================
+--- wireguard-linux-compat-1.0.20220627.orig/src/crypto/zinc/blake2s/blake2s.c
++++ wireguard-linux-compat-1.0.20220627/src/crypto/zinc/blake2s/blake2s.c
+@@ -251,8 +251,8 @@ static int __init mod_init(void)
+ {
+ 	if (!nosimd)
+ 		blake2s_fpu_init();
+-	if (!selftest_run("blake2s", blake2s_selftest, blake2s_nobs,
+-			  ARRAY_SIZE(blake2s_nobs)))
++	if (ARRAY_SIZE(blake2s_nobs) > 0 && 
++			!selftest_run("blake2s", blake2s_selftest, blake2s_nobs, ARRAY_SIZE(blake2s_nobs)))
+ 		return -ENOTRECOVERABLE;
+ 	return 0;
+ }
+Index: wireguard-linux-compat-1.0.20220627/src/crypto/zinc/curve25519/curve25519.c
+===================================================================
+--- wireguard-linux-compat-1.0.20220627.orig/src/crypto/zinc/curve25519/curve25519.c
++++ wireguard-linux-compat-1.0.20220627/src/crypto/zinc/curve25519/curve25519.c
+@@ -89,7 +89,7 @@ static int __init mod_init(void)
+ {
+ 	if (!nosimd)
+ 		curve25519_fpu_init();
+-	if (!selftest_run("curve25519", curve25519_selftest, curve25519_nobs,
++	if (ARRAY_SIZE(curve25519_nobs) > 0 && !selftest_run("curve25519", curve25519_selftest, curve25519_nobs,
+ 			  ARRAY_SIZE(curve25519_nobs)))
+ 		return -ENOTRECOVERABLE;
+ 	return 0;
