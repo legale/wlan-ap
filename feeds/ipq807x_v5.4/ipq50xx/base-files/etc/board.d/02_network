@@ -45,6 +45,13 @@ qcom_setup_interfaces()
 	hfcl,ion4xi_w)
 		ucidef_set_interface_wan "eth0"
 		;;
+ 	ikuai,sw8)
+		ucidef_set_interface_lan "eth0"
+		ucidef_set_interface_wan "eth1"
+		ucidef_add_switch "switch1"
+		ucidef_add_switch_attr "switch1" "enable" "false"
+		ucidef_add_switch_attr "switch1" "reset" "true"
+		;;
 	optimcloud,d60|\
 	optimcloud,d60-5g|\
 	optimcloud,d50|\

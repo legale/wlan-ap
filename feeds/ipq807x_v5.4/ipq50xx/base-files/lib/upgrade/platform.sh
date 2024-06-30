@@ -72,6 +72,7 @@ platform_check_image() {
 	cig,wf186h|\
 	cybertan,eww631-a1|\
 	cybertan,eww631-b1|\
+	ikuai,sw8|\
 	edgecore,eap104|\
 	hfcl,ion4x_w|\
 	hfcl,ion4xi_w|\
@@ -80,7 +81,6 @@ platform_check_image() {
 	optimcloud,d50|\
 	optimcloud,d50-5g|\
 	yuncore,fap655|\
-	udaya,a6-id2|\
 	edgecore,oap101|\
 	edgecore,oap101-6e|\
 	edgecore,oap101e|\
@@ -102,6 +102,7 @@ platform_do_upgrade() {
 	edgecore,oap101-6e|\
 	edgecore,oap101e|\
 	edgecore,oap101e-6e|\
+	ikuai,sw8|\
 	edgecore,eap104)
 		CI_UBIPART="rootfs1"
 		[ "$(find_mtd_chardev rootfs)" ] && CI_UBIPART="rootfs"
@@ -122,7 +123,6 @@ platform_do_upgrade() {
                 ;;
 	cig,wf186w|\
 	cig,wf186h|\
-	udaya,a6-id2|\
 	optimcloud,d60|\
 	optimcloud,d60-5g|\
 	optimcloud,d50|\
