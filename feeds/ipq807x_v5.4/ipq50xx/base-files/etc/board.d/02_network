@@ -55,6 +55,11 @@ qcom_setup_interfaces()
                 ucidef_set_interface_wan "eth0"
                 ucidef_set_interface_lan "eth1"
                 ;;
+	ikuai,sw8|\
+	fplus,wf-ap-624m-iic)
+		ucidef_set_interface_lan "lan"
+		ucidef_set_interface_wan "wan"
+		;;
 	yuncore,fap655)
 		ucidef_add_switch "switch1" \
 			"6@eth0" "1:lan" "2:lan" "3:lan" "4:lan" "5:wan"
@@ -97,6 +102,11 @@ qcom_setup_macs()
 	glinet,b3000)
 		wan_mac=$(cat /sys/class/net/eth1/address)
 		lan_mac=$(macaddr_add "$wan_mac" 2)
+		;;
+	ikuai,sw8|\
+	fplus,wf-ap-624m-iic)
+		wan_mac=$(cat /sys/class/net/wan/address)
+		lan_mac=$(cat /sys/class/net/lan/address)
 		;;
 	*)
 		wan_mac=$(cat /sys/class/net/eth0/address)
