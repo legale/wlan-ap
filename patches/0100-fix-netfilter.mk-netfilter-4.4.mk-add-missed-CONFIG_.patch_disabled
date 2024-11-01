@@ -6,22 +6,9 @@ Subject: [PATCH 1/4] [fix] netfilter.mk: netfilter-4.4.mk: add missed
 
 Signed-off-by: Isaev Ruslan <legale.legale@gmail.com>
 ---
- include/netfilter-4.4.mk | 1 +
  include/netfilter.mk     | 3 +++
- 2 files changed, 4 insertions(+)
+ 1 files changed, 3 insertions(+)
 
-diff --git a/include/netfilter-4.4.mk b/include/netfilter-4.4.mk
-index 086c7f3dbe..6ffd825736 100644
---- a/include/netfilter-4.4.mk
-+++ b/include/netfilter-4.4.mk
-@@ -185,6 +185,7 @@ $(eval $(call nf_add,IPT_IPV6_EXTRA,CONFIG_IP6_NF_MATCH_RT, $(P_V6)ip6t_rt))
- $(eval $(if $(NF_KMOD),$(call nf_add,NF_NAT,CONFIG_NF_NAT, $(P_XT)nf_nat),))
- $(eval $(if $(NF_KMOD),$(call nf_add,NF_NAT,CONFIG_NF_NAT_REDIRECT, $(P_XT)nf_nat_redirect, lt 4.18),))
- $(eval $(if $(NF_KMOD),$(call nf_add,NF_NAT,CONFIG_NF_NAT_IPV4, $(P_V4)nf_nat_ipv4, lt 4.18),))
-+$(eval $(if $(NF_KMOD),$(call nf_add,NF_NAT6,CONFIG_NF_NAT_IPV6, $(P_V6)nf_nat_ipv6, lt 4.18),))
- $(eval $(if $(NF_KMOD),$(call nf_add,NF_NAT,CONFIG_NF_NAT_MASQUERADE_IPV4, $(P_V4)nf_nat_masquerade_ipv4, lt 4.18),))
- 
- $(eval $(if $(NF_KMOD),$(call nf_add,IPT_NAT,CONFIG_NETFILTER_XT_NAT, $(P_XT)xt_nat),))
 diff --git a/include/netfilter.mk b/include/netfilter.mk
 index 50fa470a4f..0ac95116cd 100644
 --- a/include/netfilter.mk
