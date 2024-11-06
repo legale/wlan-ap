@@ -5,6 +5,7 @@ START=99
 boot() {
 	case "$(board_name)" in
 	ikuai,sw8|\
+	ikuai,sw8v2|\
 	fplus,wf-ap-624m-iic)
 		fw_setenv owrt_bootcount 0	
 		;;
