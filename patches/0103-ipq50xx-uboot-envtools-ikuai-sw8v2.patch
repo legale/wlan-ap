@@ -1,4 +1,4 @@
-From 7fe87aa2b17dcc54575a092121b625e7c7ecceaf Mon Sep 17 00:00:00 2001
+From e4db58f6842cf984feb97f980989745cffa94681 Mon Sep 17 00:00:00 2001
 From: Isaev Ruslan <legale.legale@gmail.com>
 Date: Wed, 6 Nov 2024 18:58:16 +0300
 Subject: [PATCH] ipq50xx: uboot-envtools: ikuai sw8v2
@@ -6,12 +6,26 @@ Subject: [PATCH] ipq50xx: uboot-envtools: ikuai sw8v2
 Signed-off-by: Isaev Ruslan <legale.legale@gmail.com>
 ---
  package/boot/uboot-envtools/files/ipq50xx | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ package/boot/uboot-envtools/files/ipq807x | 2 +-
+ 2 files changed, 2 insertions(+), 2 deletions(-)
 
 diff --git a/package/boot/uboot-envtools/files/ipq50xx b/package/boot/uboot-envtools/files/ipq50xx
 index 84ed73f288..bbfecaf3c3 100644
 --- a/package/boot/uboot-envtools/files/ipq50xx
 +++ b/package/boot/uboot-envtools/files/ipq50xx
+@@ -8,7 +8,7 @@ touch /etc/config/ubootenv
+ board=$(board_name)
+ 
+ ubootenv_mtdinfo () {
+-	UBOOTENV_PART=$(cat /proc/mtd | grep APPSBLENV)
++	UBOOTENV_PART=$(cat /proc/mtd | grep -i APPSBLENV)
+ 	mtd_dev=$(echo $UBOOTENV_PART | awk '{print $1}' | sed 's/:$//')
+ 	mtd_size=$(echo $UBOOTENV_PART | awk '{print "0x"$2}')
+ 	mtd_erase=$(echo $UBOOTENV_PART | awk '{print "0x"$3}')
+diff --git a/package/boot/uboot-envtools/files/ipq807x b/package/boot/uboot-envtools/files/ipq807x
+index 8863df4225..543ccadfe9 100644
+--- a/package/boot/uboot-envtools/files/ipq807x
++++ b/package/boot/uboot-envtools/files/ipq807x
 @@ -8,7 +8,7 @@ touch /etc/config/ubootenv
  board=$(board_name)
  

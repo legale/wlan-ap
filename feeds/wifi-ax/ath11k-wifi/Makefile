@@ -143,6 +143,11 @@ $(call Package/ath11k-wifi-default)
     TITLE:=ikuai sw8v2 bdf
 endef
 
+define Package/ath11k-wifi-fplus-wf-ap-624m-iic-v2
+$(call Package/ath11k-wifi-default)
+    TITLE:=fplus wf-ap-624m-iic-v2 bdf
+endef
+
 define Package/ath11k-wifi-fplus-wf-ap-624m-iic
 $(call Package/ath11k-wifi-default)
     TITLE:=fplus wf-ap-624m-iic bdf
@@ -327,6 +332,13 @@ define Package/ath11k-wifi-fplus-wf-ap-624m-iic/install
 	$(INSTALL_DATA) ./board-fplus-wf-ap-624m-iic.bin.QCN9074 $(1)/lib/firmware/ath11k/QCN9074/hw1.0/board.bin
 endef
 
+define Package/ath11k-wifi-fplus-wf-ap-624m-iic-v2/install
+	$(INSTALL_DIR) $(1)/lib/firmware/ath11k/IPQ5018/hw1.0/
+	$(INSTALL_DIR) $(1)/lib/firmware/ath11k/QCN9074/hw1.0/
+	$(INSTALL_DATA) ./board-fplus-wf-ap-624m-iic-v2.bin.IPQ5018 $(1)/lib/firmware/ath11k/IPQ5018/hw1.0/board.bin
+	$(INSTALL_DATA) ./board-fplus-wf-ap-624m-iic-v2.bin.QCN9074 $(1)/lib/firmware/ath11k/QCN9074/hw1.0/board.bin
+endef
+
 define Package/ath11k-wifi-optimcloud-d60/install
 	$(INSTALL_DIR) $(1)/lib/firmware/ath11k/IPQ5018/hw1.0/
 	$(INSTALL_DIR) $(1)/lib/firmware/ath11k/QCN9074/hw1.0/
@@ -452,6 +464,7 @@ $(eval $(call BuildPackage,ath11k-wifi-optimcloud-d50))
 $(eval $(call BuildPackage,ath11k-wifi-ikuai-sw8))
 $(eval $(call BuildPackage,ath11k-wifi-ikuai-sw8v2))
 $(eval $(call BuildPackage,ath11k-wifi-fplus-wf-ap-624m-iic))
+$(eval $(call BuildPackage,ath11k-wifi-fplus-wf-ap-624m-iic-v2))
 $(eval $(call BuildPackage,ath11k-wifi-optimcloud-d60))
 $(eval $(call BuildPackage,ath11k-wifi-hfcl-ion4xi))
 $(eval $(call BuildPackage,ath11k-wifi-hfcl-ion4xi_wp))

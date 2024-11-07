@@ -110,13 +110,16 @@ qcom_setup_interfaces()
         ucidef_set_interface_lan "eth1"
         ;;        
  	ikuai,sw8|\
- 	ikuai,sw8v2|\
 	fplus,wf-ap-624m-iic)
 		ucidef_set_interface_lan "lan"
 		ucidef_set_interface_wan "wan"
 		#ucidef_add_switch "switch1"
 		#ucidef_add_switch_attr "switch1" "enable" "false"
 		#ucidef_add_switch_attr "switch1" "reset" "true"
+		;;
+ 	ikuai,sw8v2|\
+	fplus,wf-ap-624m-iic-v2)
+		ucidef_set_interface_wan "wan"	
 		;;
 	qcom,ipq5018-mp03.1)
 		ucidef_set_interface_lan "eth1"
@@ -244,10 +247,13 @@ qcom_setup_macs()
 		ucidef_set_label_macaddr $wan_mac
 		;;
 	ikuai,sw8|\
-	ikuai,sw8v2|\
 	fplus,wf-ap-624m-iic)
 		wan_mac=$(cat /sys/class/net/wan/address)
 		lan_mac=$(cat /sys/class/net/lan/address)
+		;;
+	ikuai,sw8v2|\
+	fplus,wf-ap-624m-iic-v2)
+		wan_mac=$(cat /sys/class/net/wan/address)
 		;;
 	indio,um-310ax-v1|\
 	indio,um-510axp-v1|\
