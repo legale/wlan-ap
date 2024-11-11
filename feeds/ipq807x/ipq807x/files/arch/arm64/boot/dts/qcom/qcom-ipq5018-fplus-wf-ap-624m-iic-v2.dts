@@ -195,13 +195,13 @@
 				nand-ecc-step-size = <512>;
 				nand-bus-width = <8>;
 
-				partitions {
-					compatible = "fixed-partitions";
-					#address-cells = <1>;
-					#size-cells = <1>;
+//				partitions {
+//					compatible = "fixed-partitions";
+//					#address-cells = <1>;
+//					#size-cells = <1>;
 
 					partition@0 {
-						label = "training_empty";
+						label = "training";
 						reg = <0x00000000 0x00080000>;
 					};
 
@@ -214,7 +214,7 @@
 						label = "rootfs_1";
 						reg = <0x03e80000 0x03e00000>;
 					};
-				};
+//				};
 			};
 		};
 		spi_0: spi@78b5000 { /* BLSP1 QUP0 */
