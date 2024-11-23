@@ -511,7 +511,8 @@ TARGET_CPPFLAGS := \
 	$(TARGET_CPPFLAGS) \
 	-DCONFIG_LIBNL20 \
 	-D_GNU_SOURCE \
-	$(if $(CONFIG_WPA_MSG_MIN_PRIORITY),-DCONFIG_MSG_MIN_PRIORITY=$(CONFIG_WPA_MSG_MIN_PRIORITY))
+	$(if $(CONFIG_WPA_MSG_MIN_PRIORITY),-DCONFIG_MSG_MIN_PRIORITY=$(CONFIG_WPA_MSG_MIN_PRIORITY)) \
+	$(if $(CONFIG_WPA_DEBUG_FILE),-DCONFIG_DEBUG_FILE=$(CONFIG_WPA_DEBUG_FILE))
 
 TARGET_CFLAGS += -ffunction-sections -fdata-sections -flto
 TARGET_LDFLAGS += -Wl,--gc-sections -flto=jobserver -fuse-linker-plugin -lubox -lubus -lucode -lblobmsg_json -ljson-c
