@@ -1,4 +1,4 @@
-From ef4e25f2486fc8ba398f08adcfa95d168634febd Mon Sep 17 00:00:00 2001
+From 0a32f6ba14d6ab148500b983bf65b0b4f93df2cb Mon Sep 17 00:00:00 2001
 From: Isaev Ruslan <legale.legale@gmail.com>
 Date: Wed, 6 Nov 2024 19:01:09 +0300
 Subject: [PATCH] lldpd fix deps libevent2 libevent2-core
@@ -9,7 +9,7 @@ Signed-off-by: Isaev Ruslan <legale.legale@gmail.com>
  1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/package/network/services/lldpd/Makefile b/package/network/services/lldpd/Makefile
-index f90bf0ad3d..ef5af3de30 100644
+index f90bf0ad3d..304a5872cd 100644
 --- a/package/network/services/lldpd/Makefile
 +++ b/package/network/services/lldpd/Makefile
 @@ -32,7 +32,7 @@ define Package/lldpd
@@ -17,7 +17,7 @@ index f90bf0ad3d..ef5af3de30 100644
    TITLE:=Link Layer Discovery Protocol daemon
    URL:=https://vincentbernat.github.io/lldpd/
 -  DEPENDS:=+libcap +libevent2 +USE_GLIBC:libbsd +LLDPD_WITH_JSON:libjson-c +LLDPD_WITH_SNMP:libnetsnmp
-+  DEPENDS:=+libcap +libevent2-core +USE_GLIBC:libbsd +LLDPD_WITH_JSON:libjson-c +LLDPD_WITH_SNMP:libnetsnmp
++  DEPENDS:=+libcap +libevent2 +libevent2-core +USE_GLIBC:libbsd +LLDPD_WITH_JSON:libjson-c +LLDPD_WITH_SNMP:libnetsnmp
    USERID:=lldp=121:lldp=129
    MENU:=1
  endef
