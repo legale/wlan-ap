@@ -293,8 +293,10 @@ platform_check_image() {
  	optimcloud,d50-5g|\
  	ikuai,sw8|\
  	ikuai,sw8v2|\
+ 	ikuai,sw8v3|\
 	fplus,wf-ap-624m-iic|\
 	fplus,wf-ap-624m-iic-v2|\
+	fplus,wf-ap-624m-iic-v3|\
 	qcom,ipq5018-mp03.3)
 		[ "$magic_long" = "73797375" ] && return 0
 		;;
@@ -385,7 +387,9 @@ platform_do_upgrade() {
 		sw8_upgrade "$1"
 		;;
 	ikuai,sw8v2|\
-	fplus,wf-ap-624m-iic-v2)
+	ikuai,sw8v3|\
+	fplus,wf-ap-624m-iic-v2|\
+	fplus,wf-ap-624m-iic-v3)
 		CI_ROOTPART="rootfs"	
 		if $(grep -q ubi.mtd=rootfs_1 /proc/cmdline); then
 			CI_UBIPART=rootfs 

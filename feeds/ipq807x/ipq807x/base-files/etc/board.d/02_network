@@ -110,6 +110,8 @@ qcom_setup_interfaces()
         ucidef_set_interface_lan "eth1"
         ;;        
  	ikuai,sw8|\
+ 	ikuai,sw8v3|\
+	fplus,wf-ap-624m-iic-v3|\
 	fplus,wf-ap-624m-iic)
 		ucidef_set_interface_lan "lan"
 		ucidef_set_interface_wan "wan"

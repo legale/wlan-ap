@@ -1,0 +1,17 @@
+profile: ikuai_sw8v3
+target: ipq807x
+subtarget: ipq50xx
+description: Build image for the ikuai sw8v3
+image: bin/targets/ipq807x/ipq50xx/openwrt-ipq5018-ikuai_sw8v3-squashfs-sysupgrade.tar
+feeds:
+  - name: ipq807x
+    path: ../../feeds/ipq807x
+  - name: wda
+    path: /sdk1/wda_stable/openwrt
+include:
+  - ucentral-ap
+  - wifi-ax
+packages:
+  - ipq807x
+diffconfig: |
+  CONFIG_KERNEL_IPQ_MEM_PROFILE=512
