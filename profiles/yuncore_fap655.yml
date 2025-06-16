@@ -5,15 +5,15 @@ subtarget: generic
 description: Build image for Yuncore FAP655
 image: bin/targets/ipq50xx/generic/openwrt-ipq50xx-yuncore_fap655-squashfs-sysupgrade.tar
 feeds:
-  - name: qow 
-    path: /sdk1/qos-sensor_fap650-master/openwrt/openwrt
-  - name: wda
-    path: /sdk1/wda_stable/openwrt
+  - name: qow
+    path: /sdk1/qos-sensor_fap655/openwrt/openwrt
   - name: ipq807x
     path: ../../feeds/ipq807x_v5.4
 include:
   - ucentral-ap
 packages:
   - ipq50xx
+  - qow
+  - fw-version
 diffconfig: |
   CONFIG_KERNEL_IPQ_MEM_PROFILE=512
