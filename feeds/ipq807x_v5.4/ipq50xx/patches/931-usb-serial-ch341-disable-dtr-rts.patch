@@ -1,0 +1,34 @@
+Disable dtr_rts to prevent rts switching on port open
+===================================================================
+--- a/drivers/usb/serial/ch341.c
++++ b/drivers/usb/serial/ch341.c
+@@ -421,21 +421,6 @@ static int ch341_carrier_raised(struct u
+ 	return 0;
+ }
+ 
+-static void ch341_dtr_rts(struct usb_serial_port *port, int on)
+-{
+-	struct ch341_private *priv = usb_get_serial_port_data(port);
+-	unsigned long flags;
+-
+-	/* drop DTR and RTS */
+-	spin_lock_irqsave(&priv->lock, flags);
+-	if (on)
+-		priv->mcr |= CH341_BIT_RTS | CH341_BIT_DTR;
+-	else
+-		priv->mcr &= ~(CH341_BIT_RTS | CH341_BIT_DTR);
+-	spin_unlock_irqrestore(&priv->lock, flags);
+-	ch341_set_handshake(port->serial->dev, priv->mcr);
+-}
+-
+ static void ch341_close(struct usb_serial_port *port)
+ {
+ 	usb_serial_generic_close(port);
+@@ -843,7 +828,6 @@ static struct usb_serial_driver ch341_de
+ 	.id_table          = id_table,
+ 	.num_ports         = 1,
+ 	.open              = ch341_open,
+-	.dtr_rts	   = ch341_dtr_rts,
+ 	.carrier_raised	   = ch341_carrier_raised,
+ 	.close             = ch341_close,
+ 	.set_termios       = ch341_set_termios,
